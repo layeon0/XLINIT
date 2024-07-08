@@ -122,8 +122,7 @@ public class XLMySQLApplyBulkThread extends Thread {
 			// gssg - xl 전체적으로 보완
             // gssg - m2m bulk mode thread 순서 조정
 			// gssg - o2m bulk mode 스레드 순서 조정
-			while ( !this.jobRunPol.isRunLoader() ) {
-//			while ( !this.jobRunPol.isLoadQuery() && chkCnt <= MAX_CHECK_CNT ) {
+			while ( !this.jobRunPol.isLoadQuery() && chkCnt <= MAX_CHECK_CNT ) {
 								
 				chkCnt++;
 				XLLogger.outputInfoLog("[" + this.jobRunPol.getPolName() + "][APPLY BULK][LOADER] Waiting Run Loader.(" + chkCnt + ")");
@@ -262,7 +261,7 @@ public class XLMySQLApplyBulkThread extends Thread {
 					boolean loaderAlive = this.jobRunPol.isRunLoader();
 					
 					if ( XLConf.XL_DEBUG_YN ) {
-						//XLLogger.outputInfoLog("[DEBUG] loaderAlive == " + loaderAlive);
+						XLLogger.outputInfoLog("[DEBUG] loaderAlive == " + loaderAlive);
 					}
 					
 					if ( !this.jobRunPol.isAliveRecvBulkThread() &&  !loaderAlive ) {
@@ -333,6 +332,7 @@ public class XLMySQLApplyBulkThread extends Thread {
 					}
 					
 					isWait = true;
+					dataQ.waitDataQ();
 					continue;
 				}
 

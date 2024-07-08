@@ -109,9 +109,6 @@ public class XLPPASApplyThread extends Thread {
 					tdbInfo.getDbType() 
 					);
 			
-			XLLogger.outputInfoLog("ppas");
-			XLLogger.outputInfoLog(tdbInfo.getIp()+" / "+tdbInfo.getDbSid()+" / "+tdbInfo.getUserId()+" / "+tdbInfo.getPasswd()+" / "+tdbInfo.getPort()+" / "+tdbInfo.getDbType());
-			
 			
 			// Target DB Connection
 			if ( !ppasConnObj.makeConnection() ) {

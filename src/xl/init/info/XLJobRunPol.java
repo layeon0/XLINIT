@@ -1721,20 +1721,15 @@ public class XLJobRunPol {
 			if ( XLConf.XL_DEBUG_YN ) {
 				XLLogger.outputInfoLog("DEBUG ----- START WHILE! - " + isRunLoader());
 			}
-			else
-			{
-				XLLogger.outputInfoLog("[debug check] ----- START WHILE! - " + isRunLoader());
-			}
 						
-			XLLogger.outputInfoLog("[debug check2] ----- START WHILE! - " + isRunLoader()); 
 			while ( !isRunLoader() && chkCnt <= MAX_CHECK_CNT ) {
 				chkCnt++;
-				XLLogger.outputInfoLog("[" + getPolName() + "][LOADER-Runpol] Waiting Run Loader before RecvThread starting.(" + chkCnt + ")");
+				XLLogger.outputInfoLog("[" + getPolName() + "][LOADER] Waiting Run Loader before RecvThread starting.(" + chkCnt + ")");
 				Thread.sleep(1000);
 			}
 			
 			if ( XLConf.XL_DEBUG_YN ) {
-				XLLogger.outputInfoLog(" ----- END WHILE! - " + isRunLoader());
+				XLLogger.outputInfoLog("DEBUG ----- END WHILE! - " + isRunLoader());
 			}
 			
 			// cksohn - XL_BULK_MODE_YN - sqlldr 수행순서 조정 - comment

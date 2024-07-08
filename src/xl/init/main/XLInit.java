@@ -73,9 +73,9 @@ public class XLInit {
 				} else {
 					
 					/*
-					 *  [check input options : -g (Group Code), -p, -t, -bulk_mode, -paral, -bs, -ps]
+					 *  [check input options : -g, -p, -t, -bulk_mode, -paral, -bs, -ps]
 					 * 
-					 * ./xlinit -g GMP01 -p POP101 -t XLADMIN.XL_TEST01 -bulk_mode y -commit_ct 100000 -paral 2 -bs 2000 -ps 3000
+					 *  EX)./xlinit -g GMP01 -p POP101 -t XLADMIN.XL_TEST01 -bulk_mode y -commit_ct 100000 -paral 2 -bs 2000 -ps 3000
 					 */
 					
 					// ./xlinit -v
@@ -95,9 +95,10 @@ public class XLInit {
 					    epOptions.getPol_code()!=null && isStringLowerCase(epOptions.getPol_code()) &&
 					    epOptions.getTable()!=null &&
 					    epOptions.getBulk_mode()!=null &&
-					   (epOptions.getBulk_mode().equals("y") || epOptions.getBulk_mode().equals("Y") || epOptions.getBulk_mode().equals("n") || epOptions.getBulk_mode().equals("N")))
+					    // bulk_mode 옵션은 대소문자 구분하지 않음
+					   (epOptions.getBulk_mode().equalsIgnoreCase("y") || epOptions.getBulk_mode().equalsIgnoreCase("n")))
 					{
-						
+						 
 						empty_chk = true;
 						
 						bulkMode = epOptions.getBulk_mode();
@@ -105,7 +106,7 @@ public class XLInit {
 						polCode = epOptions.getPol_code();
 					    tableName = epOptions.getTable();
 					    
-					    // 키워드 -commit_count, -pl, -bs, -fs => 필수  x. 키워드 안넣어도 기본값 set
+					    // 키워드 -commit_ct, -pl, -bs, -fs => 필수  x. 키워드 안넣어도 기본값 set
 					    if( epOptions.getCommit_count()!=null){
 					    	commit_count = epOptions.getCommit_count();
 					    }

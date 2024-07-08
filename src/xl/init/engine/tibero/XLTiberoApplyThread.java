@@ -592,8 +592,6 @@ public class XLTiberoApplyThread extends Thread {
 			// cksohn - xl - 수행결과 status log 에 로깅하도록
 			XLLogger.outputInfoLog("[FINISH JOB][" + this.jobRunPol.getPolName() + "] RESULT - " + resultStatus);
 			
-			System.exit(0);
-			
 			// ] - end cksohn - xl - 수행결과 status log 에 로깅하도록
 			
 		} catch (Exception e) {

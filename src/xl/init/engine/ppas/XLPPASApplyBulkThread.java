@@ -128,7 +128,7 @@ public class XLPPASApplyBulkThread extends Thread {
 //			 XLManager.POLLING_EVENTQ.waitForeverEvent();
 			
 			if ( XLConf.XL_DEBUG_YN ) {
-				XLLogger.outputInfoLog("[DEBUG] ----- START WHILE! - " + this.jobRunPol.isRunLoader());
+				XLLogger.outputInfoLog("[DEBUG] ----- START WHILE!!!!! - " + this.jobRunPol.isRunLoader());
 			}
 									
             // gssg - xl 전체적으로 보완
@@ -143,7 +143,7 @@ public class XLPPASApplyBulkThread extends Thread {
 			}
 						
 			if ( XLConf.XL_DEBUG_YN ) {
-				XLLogger.outputInfoLog("[DEBUG] ----- END WHILE! - " + this.jobRunPol.isRunLoader());
+				XLLogger.outputInfoLog("[DEBUG] ----- END WHILE!!!! - " + this.jobRunPol.isRunLoader());
 			}
 			
 			while( true )
@@ -249,7 +249,7 @@ public class XLPPASApplyBulkThread extends Thread {
 					// cksohn - XL_BULK_MODE_YN - sqlldr 수행순서 조정
 					boolean loaderAlive = this.jobRunPol.isRunLoader();
 					if ( XLConf.XL_DEBUG_YN ) {
-						//XLLogger.outputInfoLog("[DEBUG] loaderAlive == " + loaderAlive);
+						XLLogger.outputInfoLog("[DEBUG] loaderAlive == " + loaderAlive);
 					}
 					
 					if ( !this.jobRunPol.isAliveRecvBulkThread() &&  !loaderAlive) {

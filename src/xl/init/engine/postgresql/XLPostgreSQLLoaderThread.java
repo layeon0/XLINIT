@@ -56,7 +56,7 @@ public class XLPostgreSQLLoaderThread extends Thread {
 	// cksohn - xl BULK_MODE 수행시 강제종료시 Exception 발새 오류 수정
 	private Process pr = null;
 	
-	private long totalCommitCnt =0;
+	//private long totalCommitCnt =0;
 	
 	// gssg - t2p 보완
 	// gssg - postgreSQL 커넥터 수정
@@ -190,7 +190,6 @@ public class XLPostgreSQLLoaderThread extends Thread {
 			sb_cmd.append(") ")
 			.append("FROM STDIN WITH CSV DELIMITER ',' QUOTE '\"' ESCAPE '\\' NULL AS '\\N' ENCODING 'UTF8'");
 			
-			//XLLogger.outputInfoLog(sb_cmd.toString());
 			XLLogger.outputInfoLog("[COPY LOAD] Loading to stage " + this.jobRunPol.getTableInfo().getTowner() + "." + 
 			this.jobRunPol.getTableInfo().getTtable() + " from csv");
 

@@ -154,13 +154,14 @@ public class XLTiberoApplyBulkThread extends Thread {
 
 			
 			// cksohn - XL_BULK_MODE_YN - sqlldr 수행순서 조정
+			int MAX_CHECK_CNT = 10;
 			int chkCnt = 0;
 			
 			if ( XLConf.XL_DEBUG_YN ) {
-				XLLogger.outputInfoLog("[DEBUG] ----- START WHILE!1111 - " + this.jobRunPol.isRunLoader());
+				XLLogger.outputInfoLog("[DEBUG] ----- END WHILE!!!! - " + this.jobRunPol.isRunLoader());
 			}
 			
-			while ( !this.jobRunPol.isRunLoader() ) {
+			while ( !this.jobRunPol.isRunLoader() && chkCnt <= MAX_CHECK_CNT ) {
 				chkCnt++;
 				XLLogger.outputInfoLog("[" + this.jobRunPol.getPolName() + "][APPLY BULK][LOADER] Waiting Run Loader.(" + chkCnt + ")");
 				Thread.sleep(1000);

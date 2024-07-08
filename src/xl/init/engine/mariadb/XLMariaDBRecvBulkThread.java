@@ -86,14 +86,11 @@ public class XLMariaDBRecvBulkThread extends Thread {
 			// Oracle Connection 생성
 			XLDBMSInfo sdbInfo = this.jobRunPol.getSdbInfo();
 			
-			XLLogger.outputInfoLog(sdbInfo);
-			XLLogger.outputInfoLog(this.jobRunPol.getSrcSelectSql());
 			
 			// cksohn - xl bulk mode for oracle - XL_BULK_ORACLE_EOL start - [
 			XLDBMSInfo tdbInfo = this.jobRunPol.getTdbInfo(); 
 			byte tdbType = tdbInfo.getDbType();
 			
-			XLLogger.outputInfoLog(tdbInfo);
 			// ] - end 
 			
 			// gssg - xl m2m bulk mode 지원
@@ -108,7 +105,6 @@ public class XLMariaDBRecvBulkThread extends Thread {
 					sdbInfo.getDbType() 
 					);
 			
-			XLLogger.outputInfoLog(sdbInfo.getIp() + "/" + sdbInfo.getDbSid());
 			// Target DB Connection
 			// gssg - xl m2m bulk mode 지원
 			if ( !mariaDBConnObj.makeConnection() ) {
@@ -163,7 +159,8 @@ public class XLMariaDBRecvBulkThread extends Thread {
 				if ( rowCnt <= this.jobRunPol.getCondCommitCnt() ) {
 					continue;
 				}
-	
+				
+				// ArrayList<String> arrayList = new ArrayList<>(); // record Data
 				
 				for (int i=0; i<this.vtColInfo.size(); i++) {
 					
@@ -297,7 +294,6 @@ public class XLMariaDBRecvBulkThread extends Thread {
 				pipe.write(sb_record.toString().getBytes("UTF-8"));
 				
 				// XLLogger.outputInfoLog(this.logHead + "Recv DI Send data size = " +  sb_record.length());
-				XLLogger.outputInfoLog("recv pipe write end");
 			}
 			
 			

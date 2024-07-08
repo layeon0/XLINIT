@@ -118,7 +118,7 @@ public class XLOracleApplyBulkThread extends Thread {
 			int chkCnt = 0;
 			
 			if ( XLConf.XL_DEBUG_YN ) {
-				XLLogger.outputInfoLog("[DEBUG] ----- START WHILE!1111 - " + this.jobRunPol.isRunLoader());
+				XLLogger.outputInfoLog("[DEBUG] ----- START WHILE!!!!! - " + this.jobRunPol.isRunLoader());
 			}
 			
 			while ( !this.jobRunPol.isRunLoader() && chkCnt <= MAX_CHECK_CNT ) {
@@ -128,7 +128,7 @@ public class XLOracleApplyBulkThread extends Thread {
 			}
 			
 			if ( XLConf.XL_DEBUG_YN ) {
-				XLLogger.outputInfoLog("[DEBUG] ----- END WHILE!111 - " + this.jobRunPol.isRunLoader());
+				XLLogger.outputInfoLog("[DEBUG] ----- END WHILE!!!! - " + this.jobRunPol.isRunLoader());
 			}
 			
 			while( true )
@@ -264,7 +264,6 @@ public class XLOracleApplyBulkThread extends Thread {
 						}
 					}
 					// ] end - cksohn - xl BULK_MODE 수행시 - 타겟 Oracle은 SERVICE NAME 으로 접속 하도록
-					XLLogger.outputInfoLog("["+this.jobRunPol.isAliveRecvBulkThread()+"] // ["+loaderAlive+"]");
 					
 					if ( !this.jobRunPol.isAliveRecvBulkThread() &&  !loaderAlive) {
 						
@@ -278,6 +277,7 @@ public class XLOracleApplyBulkThread extends Thread {
 						// cksohn - XL_BULK_MODE_YN - sqlldr log 파일 지정 및 결과 처리
 						
 						//String bulkLoadedCnt = getBulkLoadedCnt();
+						// lay : getbulkloade가 정상작동안해서 recv에서 applycnt get
 						long bulkLoadedCnt = jobRunPol.getApplyCnt();
 						this.totalCommitCnt  = bulkLoadedCnt;
 						this.totalApplyCnt   = this.totalCommitCnt;
@@ -287,6 +287,30 @@ public class XLOracleApplyBulkThread extends Thread {
 						// gssg - 오라클 Loader - Succes/Fail 판단 수정
 						long tempCommitCnt = 0;
 						
+						/*if ( bulkLoadedCnt != null ) {
+							StringTokenizer st = new StringTokenizer(bulkLoadedCnt, ":");
+
+							// gssg - 모듈 보완
+							// gssg - 오라클 Loader - Succes/Fail 판단 수정
+//							this.totalCommitCnt  = Long.parseLong(st.nextToken());
+							tempCommitCnt = Long.parseLong(st.nextToken());
+							if ( tempCommitCnt == -1 ) {
+								String sqlldr_error = checkSqlldrError();
+								XLLogger.outputInfoLog("[EXCEPTION LOADER] " + sqlldr_error);								
+								this.jobRunPol.setJobStatus(XLOGCons.STATUS_FAIL);
+								this.jobRunPol.setErrMsg_Loader(sqlldr_error);
+								this.jobRunPol.setErrMsg_Apply(sqlldr_error);
+								
+								FinishJob();
+
+							} else {
+								this.totalCommitCnt  = tempCommitCnt;								
+							}
+							
+							
+							this.totalApplyCnt   = this.totalCommitCnt;
+							this.failedCnt = Long.parseLong(st.nextToken());
+						}*/
 						
 						XLLogger.outputInfoLog(this.logHead + " Apply Count : " + bulkLoadedCnt + " / " + this.jobRunPol.getPolName());
 						this.applyCnt = 0; // 초기화

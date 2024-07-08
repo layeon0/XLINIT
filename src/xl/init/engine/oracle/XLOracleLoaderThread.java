@@ -76,12 +76,33 @@ public class XLOracleLoaderThread extends Thread {
 			.append("/" + tdbInfo.getPasswd()) // user passwd
 			.append("@" + tdbInfo.getIp()) // target ip
 			.append(":" + tdbInfo.getPort()) // target port
+			
+			// .append("/" + tdbInfo.getDbSid()) // target sid
+			// CKSOHN DEBUG TEST Server name NOT SID
+			// .append("/orcl") // target sid
+			
+			// cksohn - xl BULK_MODE 수행시 - 타겟 Oracle은 SERVICE NAME 으로 접속 하도록
 			.append("/" + tdbInfo.getDbServiceName()) // target sid
+
+			
 			.append(" control='" + this.jobRunPol.getBulk_ctlFilePath() + "'") // ctl file path
+			
+			// cksohn - XL_BULK_MODE_YN - sqlldr log 파일 지정 및 결과 처리
 			.append(" log='" + this.jobRunPol.getBulk_logFilePath() + "'") // log file path
+			
+			// readsize=20000000 bindsize=20000000 rows=5000 options
+			// .append(" readsize=20000000 bindsize=20000000 rows=5000") 
+			// gssg - 국가정보자원관리원 데이터이관 사업
+			// gssg - sql loader commit 기능 추가
+//			 .append(" rows=" + this.jobRunPol.getPolCommitCnt())
+			//.append(" streamsize=512000")
 			.append(" direct=true"); // sqlldr option
 			
-	
+			
+//			XLLogger.outputInfoLog("###################################################################################");
+//			XLLogger.outputInfoLog("CKSOHN DEBUG################## IMSI SID --> SERVICE NAME HARD CODING !!!!!!! ##########");
+//			XLLogger.outputInfoLog("###################################################################################");
+			
 			
 			// if ( XLConf.XL_MGR_DEBUG_YN ) {
 				XLLogger.outputInfoLog("[" + this.jobRunPol.getPolName() + "][LOADER CMD] " + sb_cmd.toString());

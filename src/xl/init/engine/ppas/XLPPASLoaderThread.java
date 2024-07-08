@@ -141,7 +141,7 @@ public class XLPPASLoaderThread extends Thread {
 			// gssg - xl 전체적으로 보완
 			// gssg - o2p 대소문자 처리
 			sb_cmd.append("COPY ");
-//				// gssg - SK텔레콤 O2M, O2P -- start
+			// gssg - SK텔레콤 O2M, O2P -- start
 			// .append( "\"" + this.jobRunPol.getTableInfo().getTowner() + "\"" + "." + "\"" + this.jobRunPol.getTableInfo().getTtable() + "\"" )
 			if ( this.jobRunPol.getSdbInfo().getDbType() == XLCons.POSTGRESQL || this.jobRunPol.getSdbInfo().getDbType() == XLCons.PPAS ) {
 				sb_cmd.append( "\"" + this.jobRunPol.getTableInfo().getTowner() + "\"" + "." + "\"" + this.jobRunPol.getTableInfo().getTtable() + "\"" );

@@ -122,9 +122,7 @@ public class XLPPASRecvBulkThread extends Thread {
 			// Target 반영 insert preparedStatement 구문 생성
 			
 			
-			// gssg - xl m2m bulk mode 지원
-			XLLogger.outputInfoLog(this.jobRunPol.getSrcSelectSql());
-			
+			// gssg - xl m2m bulk mode 지원			
 			this.pstmtSelect = (PreparedStatement)ppasConnObj.getConnection().prepareStatement(this.jobRunPol.getSrcSelectSql());
 
 						

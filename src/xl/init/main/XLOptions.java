@@ -51,9 +51,9 @@ public class XLOptions {
 	
 	public static void usage()
 	{
-		System.out.println("Usage : ./xl_init [-g grpCode] [-p polCode] [-t TableOwner.TableName] [-bulk_mode Y|N*] [-v] [-help]");
+		System.out.println("Usage : ./xl_init [-g grpCode] [-p polCode] [-t TableOwner.TableName] [-bulk_mode Y|N*] [-commit_ct Commit_count] [-paral Parallel] [-bs Batch_size] [-fs Fetch_size] [-v] [-help]");
 	}
-
+ 
 	public boolean isVersion() {
 		return isVersion;
 	}

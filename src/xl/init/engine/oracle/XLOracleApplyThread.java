@@ -223,7 +223,7 @@ public class XLOracleApplyThread extends Thread {
 						this.totalCommitCnt += this.applyCnt;
 						this.totalApplyCnt += this.applyCnt;
 						
-						//XLLogger.outputInfoLog(this.logHead + " Apply Count : " + this.applyCnt + " / " + this.jobRunPol.getPolName());
+						XLLogger.outputInfoLog(this.logHead + " Apply Count : " + this.applyCnt + " / " + this.jobRunPol.getPolName());
 						this.applyCnt = 0; // 초기화
 						// XLLogger.outputInfoLog("CKSOHN DEBUG this.totalCommitCnt FINAL = " + this.totalCommitCnt);
 						
@@ -717,9 +717,7 @@ public class XLOracleApplyThread extends Thread {
 			// XLLogger.outputInfoLog("[FINISH JOB] END - " + this.jobRunPol.getPolName() + " - " + resultStatus);	
 			// cksohn - xl - 수행결과 status log 에 로깅하도록
 			XLLogger.outputInfoLog("[FINISH JOB][" + this.jobRunPol.getPolName() + "] RESULT - " + resultStatus);
-			
-			System.exit(0);
-			
+						
 			// ] - end cksohn - xl - 수행결과 status log 에 로깅하도록
 			
 		} catch (Exception e) {

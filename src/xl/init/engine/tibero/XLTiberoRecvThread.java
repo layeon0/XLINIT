@@ -269,7 +269,7 @@ public class XLTiberoRecvThread extends Thread {
 					Vector<ArrayList<String>> vtDataSend = (Vector<ArrayList<String>>)vtData.clone();
 					
 					while ( this.dataQ.size() >= XLConf.XL_MGR_INTERNAL_QSIZE ) { // ³»ºÎ Q size check
-						//XLLogger.outputInfoLog("[RUN] INTERNAL_QSIZE : " + this.dataQ.size());
+						XLLogger.outputInfoLog("[RUN] INTERNAL_QSIZE : " + this.dataQ.size());
 						try { Thread.sleep(1000); } catch (Exception ee) {return;}						
 					}
 					

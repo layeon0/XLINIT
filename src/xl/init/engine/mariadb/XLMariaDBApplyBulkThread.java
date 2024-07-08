@@ -122,8 +122,7 @@ public class XLMariaDBApplyBulkThread extends Thread {
 			// gssg - xl 전체적으로 보완
             // gssg - m2m bulk mode thread 순서 조정
 			// gssg - o2m bulk mode 스레드 순서 조정
-			while ( !this.jobRunPol.isRunLoader()) {
-//			while ( !this.jobRunPol.isLoadQuery() && chkCnt <= MAX_CHECK_CNT ) {
+			while ( !this.jobRunPol.isLoadQuery() && chkCnt <= MAX_CHECK_CNT ) {
 								
 				chkCnt++;
 				XLLogger.outputInfoLog("[" + this.jobRunPol.getPolName() + "][APPLY BULK][LOADER] Waiting Run Loader.(" + chkCnt + ")");

@@ -166,7 +166,6 @@ public class XLOracleRecvThread extends Thread {
 					
 					// cksohn - xlim LOB 타입 지원 start - [
 					case XLDicInfoCons.CLOB:
-					case XLDicInfoCons.NCLOB:
 					case XLDicInfoCons.LONG:
 					case XLDicInfoCons.XMLTYPE:
 												
@@ -177,13 +176,13 @@ public class XLOracleRecvThread extends Thread {
 								value = null; // oracle은 "" 도 null								
 							}						
 						} else if ( value != null && colInfo.getFunctionStr().equalsIgnoreCase("XL_REPLACE_NULL") ) {
-							// gssg - 모듈 보완
-							// gssg - O2P - 0x00 데이터 처리					
 							value = rs.getString(i+1);
-//							byte[] hexBytesChar = rs.getBytes(i+1);
-//							byte[] hexBytesChar = value.getBytes(StandardCharsets.UTF_8);
+
+							// gssg - SK텔레콤 O2M, O2P								
+//							byte[] hexBytesChar =rs.getBytes(i+1);
 							byte[] hexBytesChar = null;
-						    if ( tdbInfo.getnCharSet().contains("WIN949") || tdbInfo.getnCharSet().contains("CP949")) {
+							
+						    if ( tdbInfo.getCharSet().contains("WIN949") || tdbInfo.getCharSet().contains("CP949")) {
 								hexBytesChar = value.getBytes("MS949");
 						    } else if ( tdbInfo.getCharSet().contains("EUC") ) {
 								hexBytesChar = value.getBytes("EUC-KR");
@@ -192,12 +191,50 @@ public class XLOracleRecvThread extends Thread {
 						    } else {
 								hexBytesChar = value.getBytes("UTF-8");
 						    }												
+														
 							value = XLUtil.bytesToHexString(hexBytesChar);							
-						} else {
+							
+						}else {
 							value = rs.getString(i+1);
 						}
 						break;
 						
+					// gssg - SK텔레콤 O2M, O2P -- start
+					case XLDicInfoCons.NCLOB:
+						
+						if ( XLConf.XL_LOB_STREAM_YN ) { // cksohn - xl XL_LOB_STREAM_YN=Y|*N
+							
+							value = getReaderClob(rs.getCharacterStream(i+1));
+							if (value != null && value.equals("")) {
+								value = null; // oracle은 "" 도 null								
+							}						
+						} else if ( value != null && colInfo.getFunctionStr().equalsIgnoreCase("XL_REPLACE_NULL") ) {
+							value = rs.getString(i+1);
+
+							// gssg - SK텔레콤 O2M, O2P								
+//							byte[] hexBytesChar =rs.getBytes(i+1);
+							byte[] hexBytesChar = null;
+							
+						    if ( tdbInfo.getnCharSet().contains("WIN949") || tdbInfo.getnCharSet().contains("CP949")) {
+								hexBytesChar = value.getBytes("MS949");
+						    } else if ( tdbInfo.getnCharSet().contains("EUC") ) {
+								hexBytesChar = value.getBytes("EUC-KR");
+						    } else if ( tdbInfo.getnCharSet().contains("KSC5601") ) {
+								hexBytesChar = value.getBytes("KSC5601");
+						    } else {
+								hexBytesChar = value.getBytes("UTF-8");
+						    }												
+														
+							value = XLUtil.bytesToHexString(hexBytesChar);							
+							
+						} else {
+							value = rs.getString(i+1);
+						}
+						
+						break;
+						
+						// gssg - SK텔레콤 O2M, O2P -- end
+							
 					case XLDicInfoCons.BLOB:
 					case XLDicInfoCons.LONGRAW:
 						
@@ -225,27 +262,51 @@ public class XLOracleRecvThread extends Thread {
 						
 					
 					case XLDicInfoCons.CHAR:
+						
+						value = rs.getString(i+1);
+						
+						if ( value != null && colInfo.getFunctionStr().equalsIgnoreCase("XL_REPLACE_NULL") ) {
+							
+							// gssg - SK텔레콤 O2M, O2P								
+//							byte[] hexBytesChar =rs.getBytes(i+1);
+							byte[] hexBytesChar = null;
+						    if ( tdbInfo.getCharSet().contains("WIN949") || tdbInfo.getCharSet().contains("CP949")) {
+								hexBytesChar = value.getBytes("MS949");
+						    } else if ( tdbInfo.getCharSet().contains("EUC") ) {
+								hexBytesChar = value.getBytes("EUC-KR");
+						    } else if ( tdbInfo.getCharSet().contains("KSC5601") ) {
+								hexBytesChar = value.getBytes("KSC5601");
+						    } else {
+								hexBytesChar = value.getBytes("UTF-8");
+						    }												
+												
+							value = XLUtil.bytesToHexString(hexBytesChar);							
+						} 
+																		
+						break;
+
+					// gssg - SK텔레콤 O2M, O2P
 					case XLDicInfoCons.NCHAR:
 												
 						value = rs.getString(i+1);
 						
 						if ( value != null && colInfo.getFunctionStr().equalsIgnoreCase("XL_REPLACE_NULL") ) {
-							// gssg - 모듈 보완
-							// gssg - O2P - 0x00 데이터 처리													
-//							byte[] hexBytesChar = value.getBytes(StandardCharsets.UTF_8);
-							byte[] hexBytesChar =rs.getBytes(i+1);
+							
+							// gssg - SK텔레콤 O2M, O2P								
+//							byte[] hexBytesChar =rs.getBytes(i+1);
+							byte[] hexBytesChar = null;
+						    if ( tdbInfo.getnCharSet().contains("WIN949") || tdbInfo.getnCharSet().contains("CP949")) {
+								hexBytesChar = value.getBytes("MS949");
+						    } else if ( tdbInfo.getnCharSet().contains("EUC") ) {
+								hexBytesChar = value.getBytes("EUC-KR");
+						    } else if ( tdbInfo.getnCharSet().contains("KSC5601") ) {
+								hexBytesChar = value.getBytes("KSC5601");
+						    } else {
+								hexBytesChar = value.getBytes("UTF-8");
+						    }												
 												
 							value = XLUtil.bytesToHexString(hexBytesChar);							
-						} 
-
-						
-//						if (value != null && value.equals("")) {
-//							value = null; // oracle은 "" 도 null
-//						} else	if ( value != null && XLConf.XL_SRC_CHAR_RAWTOHEX_YN ) {
-//							// cksohn - XL_SRC_CHAR_RAWTOHEX_YN / XL_SRC_CHAR_ENCODE
-//							// Hex String
-//							value = new String(XLUtil.hexToByteArray(value), XLConf.XL_SRC_CHAR_ENCODE) ;							
-//						}						
+						} 		
 												
 						break;
 						
@@ -258,11 +319,20 @@ public class XLOracleRecvThread extends Thread {
 
 						if ( value != null ) {
 							if ( colInfo.getFunctionStr().equalsIgnoreCase("XL_REPLACE_NULL") ) {
-								// gssg - 모듈 보완
-								// gssg - O2P - 0x00 데이터 처리
-//								byte[] hexBytesChar = value.getBytes(StandardCharsets.UTF_8);
-								byte[] hexBytesChar =rs.getBytes(i+1);
-													
+								
+								// gssg - SK텔레콤 O2M, O2P								
+//								byte[] hexBytesChar =rs.getBytes(i+1);
+								byte[] hexBytesChar = null;
+							    if ( tdbInfo.getCharSet().contains("WIN949") || tdbInfo.getCharSet().contains("CP949")) {
+									hexBytesChar = value.getBytes("MS949");
+							    } else if ( tdbInfo.getCharSet().contains("EUC") ) {
+									hexBytesChar = value.getBytes("EUC-KR");
+							    } else if ( tdbInfo.getCharSet().contains("KSC5601") ) {
+									hexBytesChar = value.getBytes("KSC5601");
+							    } else {
+									hexBytesChar = value.getBytes("UTF-8");
+							    }												
+															
 								value = XLUtil.bytesToHexString(hexBytesChar);							
 								
 							} else if ( colInfo.getSecYN().equals("Y") ) {
@@ -290,34 +360,7 @@ public class XLOracleRecvThread extends Thread {
 								value = new String(enc);
 								
 							}
-						}
-						
-						
-						
-//						if (value != null && value.equals("")) {
-//							value = null; // oracle은 "" 도 null
-//						} else if ( value != null && colInfo.getSecYN().equals("Y") ) {
-//
-//							// gssg - o2o damo 적용							
-//							String iniFilePath = XLConf.XL_TAR_KEYFILE_PATH;	
-//						    ScpDbAgent agt = new ScpDbAgent();						      
-//						    byte[] enc = null;
-//
-////						    XLLogger.outputInfoLog("################################################################################");
-////							XLLogger.outputInfoLog("[GSSG DEBUG] VARCHAR enc = agt.ScpEncB64( iniFilePath, \"KEY1\", value.getBytes(\"MS949\") );");
-////							XLLogger.outputInfoLog("################################################################################");
-//
-//						    enc = agt.ScpEncStr(iniFilePath, "KEY2", value.getBytes("MS949"));
-//						
-//							value = new String(enc);
-//
-//						} else if ( value != null && XLConf.XL_SRC_CHAR_RAWTOHEX_YN ) {
-//							
-//							// cksohn - XL_SRC_CHAR_RAWTOHEX_YN / XL_SRC_CHAR_ENCODE							
-//							// Hex String
-//							value = new String(XLUtil.hexToByteArray(value), XLConf.XL_SRC_CHAR_ENCODE) ;
-//						}						
-						
+						}						
 						break;
 						
 						// gssg - damo 캐릭터셋 하드 코딩 보완
@@ -328,14 +371,21 @@ public class XLOracleRecvThread extends Thread {
 							value = rs.getString(i+1);
 
 							if ( value != null ) {
-								if ( colInfo.getFunctionStr().equalsIgnoreCase("XL_REPLACE_NULL") ) {
-									// gssg - 모듈 보완
-									// gssg - O2P - 0x00 데이터 처리
-									// gssg - 대법원 O2O
-									// gssg - raw_to_varchar2 기능 지원							 
-//									byte[] hexBytesChar = value.getBytes(StandardCharsets.UTF_8);
-									byte[] hexBytesChar =rs.getBytes(i+1);
-														
+								if ( colInfo.getFunctionStr().equalsIgnoreCase("XL_REPLACE_NULL") ) {									
+									
+									// gssg - SK텔레콤 O2M, O2P								
+//									byte[] hexBytesChar =rs.getBytes(i+1);
+									byte[] hexBytesChar = null;
+								    if ( tdbInfo.getnCharSet().contains("WIN949") || tdbInfo.getnCharSet().contains("CP949")) {
+										hexBytesChar = value.getBytes("MS949");
+								    } else if ( tdbInfo.getnCharSet().contains("EUC") ) {
+										hexBytesChar = value.getBytes("EUC-KR");
+								    } else if ( tdbInfo.getnCharSet().contains("KSC5601") ) {
+										hexBytesChar = value.getBytes("KSC5601");
+								    } else {
+										hexBytesChar = value.getBytes("UTF-8");
+								    }												
+																														
 									value = XLUtil.bytesToHexString(hexBytesChar);							
 									
 								} else if ( colInfo.getSecYN().equals("Y") ) {
@@ -364,33 +414,7 @@ public class XLOracleRecvThread extends Thread {
 									
 								}
 							}
-							
-							
-							
-//							if (value != null && value.equals("")) {
-//								value = null; // oracle은 "" 도 null
-//							} else if ( value != null && colInfo.getSecYN().equals("Y") ) {
-	//
-//								// gssg - o2o damo 적용							
-//								String iniFilePath = XLConf.XL_TAR_KEYFILE_PATH;	
-//							    ScpDbAgent agt = new ScpDbAgent();						      
-//							    byte[] enc = null;
-	//
-////							    XLLogger.outputInfoLog("################################################################################");
-////								XLLogger.outputInfoLog("[GSSG DEBUG] VARCHAR enc = agt.ScpEncB64( iniFilePath, \"KEY1\", value.getBytes(\"MS949\") );");
-////								XLLogger.outputInfoLog("################################################################################");
-	//
-//							    enc = agt.ScpEncStr(iniFilePath, "KEY2", value.getBytes("MS949"));
-//							
-//								value = new String(enc);
-	//
-//							} else if ( value != null && XLConf.XL_SRC_CHAR_RAWTOHEX_YN ) {
-//								
-//								// cksohn - XL_SRC_CHAR_RAWTOHEX_YN / XL_SRC_CHAR_ENCODE							
-//								// Hex String
-//								value = new String(XLUtil.hexToByteArray(value), XLConf.XL_SRC_CHAR_ENCODE) ;
-//							}						
-							
+
 							break;
 												
 					default : 
@@ -415,7 +439,7 @@ public class XLOracleRecvThread extends Thread {
 					Vector<ArrayList<String>> vtDataSend = (Vector<ArrayList<String>>)vtData.clone();
 					
 					while ( this.dataQ.size() >= XLConf.XL_MGR_INTERNAL_QSIZE ) { // 내부 Q size check
-						//XLLogger.outputInfoLog("[RUN] INTERNAL_QSIZE : " + this.dataQ.size());
+						XLLogger.outputInfoLog("[RUN] INTERNAL_QSIZE : " + this.dataQ.size());
 						try { Thread.sleep(1000); } catch (Exception ee) {return;}						
 					}
 					
