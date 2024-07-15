@@ -310,6 +310,8 @@ public class XLMySQLRecvBulkThread extends Thread {
 			this.jobRunPol.setApplyCnt(recvCnt); // gssg - xl recvCnt를 applyCnt로 적용
 			
 			// cksohn - BULK mode oracle sqlldr
+			this.dataQ.notifyEvent();
+			
 			return;
 			
 		} catch (Exception e) {

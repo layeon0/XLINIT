@@ -103,6 +103,8 @@ public class XLMemInfo {
 				// XLDBMSInfo dbInfo = new XLDBMSInfo(ip, dbSid, port, dbTypeStr, dbType, userId, passwd, cpuThreshold, cpuThresholdTime, maxJobCnt);
 				// cksohn - xl BULK_MODE 수행시 - 타겟 Oracle은 SERVICE NAME 으로 접속 하도록
 				
+					XLLogger.outputInfoLog("[IP]"+ip);
+				 // if(ip.equals("192.168.0.197")) {dbSid="soe";}
 				  XLDBMSInfo dbInfo = new XLDBMSInfo(ip, dbSid, dbServiceName, port, dbTypeStr, dbType, userId, passwd, charSet, nCharSet);
 				  
 				  String key = ip + "_" + dbSid;

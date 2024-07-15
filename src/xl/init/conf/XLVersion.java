@@ -652,8 +652,52 @@ public class XLVersion {
 
 	1.0.24-001 [X-LOG INIT]
 	# 2024-07-01
-	# ayzn - IDL 엔진기반으로 CDC 테이블 초기화 기능 개발 #
-	[ ayzn - INIT 테이블 초기화  기능 개발]
+	# ayzn - XLInit 기능 개발  #
+	# ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경) #
+	# ayzn - XLInit 기능 개발 - conf 수정 (디버그 모드 true로 변경) #
+	# ayzn - XLInit 기능 개발 - conf 수정 (키워드 처리 추가) #
+	# ayzn - XLInit 기능 개발 - conf 수정 (로그명 포맷 변경) #
+	
+	# ayzn - XLInit 기능 개발  - InitThread : 받아오는 옵션 값 세팅(정책명, 그룹명, 테이블명) #
+	# ayzn - XLInit 기능 개발  - InitThread : 생성자 추가  # 
+	# ayzn - XLInit 기능 개발  - InitThread : 기존  polling 방식의 while 주석처리 # 
+	# ayzn - XLInit 기능 개발  - InitThread : CNT관련 메모리 주석  # 
+	# ayzn - XLInit 기능 개발  - InitThread : IDL의 JOBQ 테이블처리 주석 #  
+	# ayzn - XLInit 기능 개발  - InitThread : - 1. 소스 DB 정보 세팅 #  
+	# ayzn - XLInit 기능 개발  - InitThread : JOBQ -> SOURCE DB 정보 추출  # 
+	# ayzn - XLInit 기능 개발  - InitThread :  size < 1 체크 추가 #  
+	# ayzn - XLInit 기능 개발  - InitThread : JOBQ -> SOURCE DB 정보 추출 및 HT_JOBQ_DBMS_RCNT_TMP 주석 #  
+	# ayzn - XLInit 기능 개발  - InitThread : INIT에서 사용하지 않는  코드 주석 #  
+	# ayzn - XLInit 기능 개발  - InitThread : 함수명 runPol로 변경 및 continue에서 시스템종료로 변경  # 
+	# ayzn - XLInit 기능 개발  - InitThread : INIT에서 사용하지 않는  JOPQ 관련 코드 주석 #  
+	# ayzn - XLInit 기능 개발  - InitThread : source db정보로  필요한 정보 세팅 #  
+	# ayzn - XLInit 기능 개발  - InitThread : condWhere제외 주석처리 #  
+	# ayzn - XLInit 기능 개발  - InitThread : 인자값 수정 #  
+	# ayzn - XLInit 기능 개발  - InitThread : INIT에서 사용하지 않는  cnt메모리 관련 코드 주석 #  
+	# ayzn - XLInit 기능 개발  - InitThread : jobseq제외하고 처리 #  
+	# ayzn - XLInit 기능 개발  - InitThread : INIT에서 사용하지 않는 코드 주석 #  
+	
+	# ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobq, cond commit 주석 #
+	# ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobseq 제외 #
+	# ayzn - XLInit 기능 개발  - DB 엔진 수정 : report, condition, jobq 테이블 관련 처리 주석 #
+	
+	# ayzn - XLInit 기능 개발  - DBManager : CDC카탈로그 conf 기준으로 변경 #
+	# ayzn - XLInit 기능 개발  - DBManager : getDbmsInfo함수 쿼리 CDC 카타로그 테이블 참조로 변경 #
+	# ayzn - XLInit 기능 개발  - DBManager : getPolInfo 함수 추가 ( Source, Target(일대다 정책일 시  NR_POL의  DBMS_SEQ 기준) 정보 추출 ) #
+	# ayzn - XLInit 기능 개발  - DBManager : getSourceInfo 함수 추가 ( SOURCE 정보 추출 ) #
+	# ayzn - XLInit 기능 개발  - DBManager : getJobRunPolInfo 함수  변경 ( CDC카탈로그 참조하여 컬럼정보 추출 ) #
+	
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : jobseq 주석 #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : 옵션 grpcode, tableName 추가 #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : source 테이블이름 #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : init에서 사용하지않는 file생성기능 주석 #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : commit_count, parallel 옵션 처리 추가 #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol :  수행 대상 정보 세팅 (Source, Target) #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : getJobRunPolInfo 함수처리 시 조건절 추가 및 변경 #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : CDC 카탈로그 테이블에 없는 설정값 주석처리 #
+	# ayzn - XLInit 기능 개발  - XLJobRunPol : Table 컬럼 정보 생성 시 CDC 카탈로그 테이블 참조로 변경 #
+									
+	[ ayzn - IDL 코드 기반으로 CDC 테이블  초기화 기능 개발]
 
 **/
 

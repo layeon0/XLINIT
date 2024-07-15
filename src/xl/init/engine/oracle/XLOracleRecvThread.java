@@ -129,7 +129,7 @@ public class XLOracleRecvThread extends Thread {
 			long rowCnt = 0;
 			
 			long recvCnt = 0; // skip 한것을 제외한 select count 건수
-						
+			
 			while ( rs.next() ) {
 			
 				rowCnt++;

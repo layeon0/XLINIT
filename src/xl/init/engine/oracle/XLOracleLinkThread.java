@@ -198,6 +198,21 @@ public class XLOracleLinkThread extends Thread {
 			
 			this.applyCnt = 0;
 			
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobq, cond commit 주석
+			/*this.pstmtUpdateJobQCommitCnt.setLong(1,  this.totalCommitCnt);
+			this.pstmtUpdateJobQCommitCnt.setLong(2,  this.jobRunPol.getJobseq());
+			this.pstmtUpdateJobQCommitCnt.setString(3,  this.jobRunPol.getPolName());
+			this.pstmtUpdateJobQCommitCnt.executeUpdate();
+			
+			this.pstmtUpdateCondCommitCnt.setLong(1,  this.totalCommitCnt);
+			this.pstmtUpdateCondCommitCnt.setString(2,  this.jobRunPol.getPolName());
+			this.pstmtUpdateCondCommitCnt.setLong(3,  this.jobRunPol.getCondSeq());
+			// gssg - 일본 네트워크 분산 처리
+			this.pstmtUpdateCondCommitCnt.setLong(4, this.jobRunPol.getWorkPlanSeq());
+
+			this.pstmtUpdateCondCommitCnt.executeUpdate();
+			this.cataConn.commit();*/
+			
 			this.jobRunPol.setJobStatus(XLOGCons.STATUS_SUCCESS);
 			FinishJob();
 			
@@ -215,8 +230,9 @@ public class XLOracleLinkThread extends Thread {
 			try { if ( this.insertSelectStmt != null ) this.insertSelectStmt.close(); } catch (Exception e) {} finally { this.insertSelectStmt = null; }			
 			try { if ( this.connection != null ) this.connection.close(); } catch (Exception e) {} finally { this.connection = null; }
 			
-			try { if ( this.pstmtUpdateJobQCommitCnt != null ) this.pstmtUpdateJobQCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateJobQCommitCnt = null; }
-			try { if ( this.pstmtUpdateCondCommitCnt != null ) this.pstmtUpdateCondCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateCondCommitCnt = null; }
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobq, cond commit 주석
+			//try { if ( this.pstmtUpdateJobQCommitCnt != null ) this.pstmtUpdateJobQCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateJobQCommitCnt = null; }
+			//try { if ( this.pstmtUpdateCondCommitCnt != null ) this.pstmtUpdateCondCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateCondCommitCnt = null; }
 			try { if ( this.cataConn != null ) this.cataConn.close(); } catch (Exception e) {} finally { this.cataConn = null; }			
 
 		}
@@ -242,7 +258,26 @@ public class XLOracleLinkThread extends Thread {
 				//	this.jobRunPol.stopRecvThread();
 				// }
 				
-				 
+				// ayzn - XLInit 기능 개발  - DB 엔진 수정 : report, condition, jobq 테이블 관련 처리 주석
+				// 2. status 에 따른 정보갱신 및 REPORT 결과 저장
+				//  2-1 REPORT 테이블 결과저장
+				/*if ( !mDBMgr.insertJobResultReport(this.cataConn, this.jobRunPol, this.totalCommitCnt) ) {
+					XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to insert job result report - " + this.jobRunPol.getCondWhere());
+				}
+				
+				//  2-2 CONDITION 테이블 STATUS update
+				if ( !mDBMgr.updateJobResultCond(this.cataConn, this.jobRunPol) ) {
+					XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to update job result condition_action - " + this.jobRunPol.getCondWhere());
+				}
+							
+				//  2-3 JOBQ 테이블 삭제
+				if ( !mDBMgr.deleteJobQ(this.cataConn, this.jobRunPol) ) {
+					XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to delete jobQ - " + this.jobRunPol.getCondWhere());
+				}
+				
+				
+				this.cataConn.commit();*/
+				
 				// XLLogger.outputInfoLog("[FINISH JOB] END - " + this.jobRunPol.getPolName());
 				// XLLogger.outputInfoLog("[FINISH JOB] END - " + this.jobRunPol.getPolName());
 				// cksohn - xl - 수행결과 status log 에 로깅하도록 start - [

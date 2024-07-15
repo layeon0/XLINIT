@@ -115,7 +115,6 @@ public class XLMariaDBLoaderThread extends Thread {
 
 			this.stmtInsert = (Statement)mariaDBConnObj.getConnection().createStatement();
 			StringBuffer sb_cmd = new StringBuffer();
-			XLLogger.outputInfoLog("loader pipe path call");
 			// gssg - xl m2m bulk mode 지원
 			sb_cmd.append("LOAD DATA LOCAL INFILE '")
 			.append(jobRunPol.getBulk_pipePath()) // csv path
@@ -153,7 +152,7 @@ public class XLMariaDBLoaderThread extends Thread {
 
 			for(int i = 0; i < vtJobColInfo.size();i++) {					
 					XLJobColInfo colInfo = vtJobColInfo.get(i);					
-					if (		
+					if(		
 							// gssg - 카카오 - m2m bulk mode 보완
 							colInfo.getDataType() == XLDicInfoCons.BIT || 
 							colInfo.getDataType() == XLDicInfoCons.BINARY || 
@@ -221,7 +220,7 @@ public class XLMariaDBLoaderThread extends Thread {
 			XLLogger.outputInfoLog("[" + this.jobRunPol.getPolName() + "][LOADER CMD] " + sb_cmd.toString());
 			// }
  			
-			XLLogger.outputInfoLog(this.logHead + " Finished LoaderThread(BULK MODE)");
+			XLLogger.outputInfoLog(this.logHead + " Finished ApplyLoaderThread(BULK MODE)");
 			
 			
 		} catch (Exception e) {

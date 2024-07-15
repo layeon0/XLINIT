@@ -57,7 +57,6 @@ public class XLPPASLoaderThread extends Thread {
 	// gssg - xl o2p bulk mode 지원
 	// gssg - mysql -> ppas 변경
 	private XLPPASConnection ppasConnObj = null;
-//	private Statement stmtInsert = null;
 	
 	public XLPPASLoaderThread(XLJobRunPol jobRunPol) {
 		super();

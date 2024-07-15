@@ -215,8 +215,8 @@ public class XLMySQLLoaderThread extends Thread {
 			// gssg - xl 전체적으로 보완
             // gssg - m2m bulk mode thread 순서 조정
             // gssg - 카카오 - m2m bulk mode 보완
-//            this.jobRunPol.setLoadQuery(true);           
-			
+////        this.jobRunPol.setLoadQuery(true);           
+            
 			// if ( XLConf.XL_MGR_DEBUG_YN ) {
 			XLLogger.outputInfoLog("[" + this.jobRunPol.getPolName() + "][LOADER CMD] " + sb_cmd.toString());
 			// }
@@ -244,6 +244,7 @@ public class XLMySQLLoaderThread extends Thread {
 			try { if ( this.mySQLConnObj != null ) this.mySQLConnObj.closeConnection(); } catch (Exception e) {} finally { this.mySQLConnObj = null; }
 
 			// cksohn - BULK mode oracle sqlldr
+			this.jobRunPol.getDataQ().notifyEvent();
 
 			// cksohn - XL_BULK_MODE_YN - sqlldr 수행순서 조정
 			this.jobRunPol.setRunLoader(false);

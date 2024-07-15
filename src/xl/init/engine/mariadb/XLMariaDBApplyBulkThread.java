@@ -51,6 +51,9 @@ public class XLMariaDBApplyBulkThread extends Thread {
 	
 	
 	private Connection cataConn = null;
+	// ayzn - XLInit 기능 개발  - DB 엔진 수정  : jobq, cond commit 주석
+	//private PreparedStatement pstmtUpdateJobQCommitCnt = null;
+	//private PreparedStatement pstmtUpdateCondCommitCnt = null;
 	
 	
 	private long applyCnt = 0;
@@ -102,6 +105,9 @@ public class XLMariaDBApplyBulkThread extends Thread {
 			
 			XLMDBManager mDBMgr = new XLMDBManager();
 			this.cataConn = mDBMgr.createConnection(false);			
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정  : jobq, cond commit 주석
+			//this.pstmtUpdateJobQCommitCnt = mDBMgr.getPstmtUpdateJobQCommitCnt(this.cataConn);
+			//this.pstmtUpdateCondCommitCnt = mDBMgr.getPstmtUpdateCondCommitCnt(this.cataConn);
 			 
 			
 			XLDBMSInfo tdbInfo = this.jobRunPol.getTdbInfo();
@@ -122,7 +128,8 @@ public class XLMariaDBApplyBulkThread extends Thread {
 			// gssg - xl 전체적으로 보완
             // gssg - m2m bulk mode thread 순서 조정
 			// gssg - o2m bulk mode 스레드 순서 조정
-			while ( !this.jobRunPol.isLoadQuery() && chkCnt <= MAX_CHECK_CNT ) {
+			while ( !this.jobRunPol.isRunLoader() && chkCnt <= MAX_CHECK_CNT ) {
+//			while ( !this.jobRunPol.isLoadQuery() && chkCnt <= MAX_CHECK_CNT ) {
 								
 				chkCnt++;
 				XLLogger.outputInfoLog("[" + this.jobRunPol.getPolName() + "][APPLY BULK][LOADER] Waiting Run Loader.(" + chkCnt + ")");
@@ -295,7 +302,20 @@ public class XLMariaDBApplyBulkThread extends Thread {
 						this.applyCnt = 0; // 초기화
 						// XLLogger.outputInfoLog("CKSOHN DEBUG this.totalCommitCnt FINAL = " + this.totalCommitCnt);
 						
+						// ayzn - XLInit 기능 개발  - DB 엔진 수정  : jobq, cond commit 주석
+						/*this.pstmtUpdateJobQCommitCnt.setLong(1,  this.totalCommitCnt);
+						this.pstmtUpdateJobQCommitCnt.setLong(2,  this.jobRunPol.getJobseq());
+						this.pstmtUpdateJobQCommitCnt.setString(3,  this.jobRunPol.getPolName());
+						this.pstmtUpdateJobQCommitCnt.executeUpdate();
 						
+						this.pstmtUpdateCondCommitCnt.setLong(1,  this.totalCommitCnt);
+						this.pstmtUpdateCondCommitCnt.setString(2,  this.jobRunPol.getPolName());
+						this.pstmtUpdateCondCommitCnt.setLong(3,  this.jobRunPol.getCondSeq());
+						// gssg - 일본 네트워크 분산 처리
+						this.pstmtUpdateCondCommitCnt.setLong(4, this.jobRunPol.getWorkPlanSeq());
+
+						this.pstmtUpdateCondCommitCnt.executeUpdate();
+						this.cataConn.commit();*/
 						
 						if ( XLConf.XL_DEBUG_YN ) {
 							XLLogger.outputInfoLog("[DEBUG] commitCnt-FINAL : " + this.totalCommitCnt);
@@ -367,6 +387,9 @@ public class XLMariaDBApplyBulkThread extends Thread {
 			try { if ( this.pstmtInsert != null ) this.pstmtInsert.close(); } catch (Exception e) {} finally { this.pstmtInsert = null; }
 			try { if ( this.mariaDBConnObj != null ) this.mariaDBConnObj.closeConnection(); } catch (Exception e) {} finally { this.mariaDBConnObj = null; }
 				
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정  : jobq, cond commit 주석
+			//try { if ( this.pstmtUpdateJobQCommitCnt != null ) this.pstmtUpdateJobQCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateJobQCommitCnt = null; }
+			//try { if ( this.pstmtUpdateCondCommitCnt != null ) this.pstmtUpdateCondCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateCondCommitCnt = null; }
 			try { if ( this.cataConn != null ) this.cataConn.close(); } catch (Exception e) {} finally { this.cataConn = null; }
 
 		
@@ -390,7 +413,11 @@ public class XLMariaDBApplyBulkThread extends Thread {
 			//}
 			
 			// 메모리 정리는 여기서!!!!!
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobseq 제외
+			//XLMemInfo.removeRJobPolInfo(this.jobRunPol.getPolName(), this.jobRunPol.getJobseq());
 			XLMemInfo.removeRJobPolInfo(this.jobRunPol.getPolName());
+			
+			XLInit.POLLING_EVENTQ.notifyEvent();
 			
 			}
 		// }
@@ -409,6 +436,32 @@ public class XLMariaDBApplyBulkThread extends Thread {
 			XLLogger.outputInfoLog("[FINISH JOB][" + this.jobRunPol.getPolName() + "] totalCommitCnt : " + this.totalCommitCnt);
 			
 			XLMDBManager mDBMgr = new XLMDBManager();
+			
+			// 1. Recv Thread check & interrupt -여기서는 이거하면 안된다.
+			//if ( this.jobRunPol.isAliveRecvThread() ) {
+			//	XLLogger.outputInfoLog("[FINISH JOB] RecvThread is still alive. stop RecvThread");
+			//	this.jobRunPol.stopRecvThread();
+			// }
+			
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : report, condition, jobq 테이블 관련 처리 주석
+			// 2. status 에 따른 정보갱신 및 REPORT 결과 저장
+			//  2-1 REPORT 테이블 결과저장
+			/*if ( !mDBMgr.insertJobResultReport(this.cataConn, this.jobRunPol, this.totalCommitCnt) ) {
+				XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to insert job result report - " + this.jobRunPol.getCondWhere());
+			}
+			
+			//  2-2 CONDITION 테이블 STATUS update
+			if ( !mDBMgr.updateJobResultCond(this.cataConn, this.jobRunPol) ) {
+				XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to update job result condition_action - " + this.jobRunPol.getCondWhere());
+			}
+						
+			//  2-3 JOBQ 테이블 삭제
+			if ( !mDBMgr.deleteJobQ(this.cataConn, this.jobRunPol) ) {
+				XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to delete jobQ - " + this.jobRunPol.getCondWhere());
+			}
+			
+			
+			this.cataConn.commit();*/
 			
 			// XLLogger.outputInfoLog("[FINISH JOB] END - " + this.jobRunPol.getPolName());
 			// cksohn - xl - 수행결과 status log 에 로깅하도록 start - [

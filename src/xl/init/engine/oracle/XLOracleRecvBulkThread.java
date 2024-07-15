@@ -76,7 +76,7 @@ public class XLOracleRecvBulkThread extends Thread {
 		long stime = 0; // 시작 시간
 		long etime = 0; // 종료 시간
 		
-			try {
+		try {
 			
 			XLLogger.outputInfoLog("");
 			XLLogger.outputInfoLog(this.logHead + " Starting RecvThread(Direct Patn Mode)..." + this.jobRunPol.getCondWhere());
@@ -639,6 +639,7 @@ public class XLOracleRecvBulkThread extends Thread {
 			this.jobRunPol.setApplyCnt(recvCnt); // xl recvCnt를 applyCnt로 적용
 
 			// cksohn - BULK mode oracle sqlldr
+			this.dataQ.notifyEvent();
 			
 			return;
 			
@@ -686,10 +687,9 @@ public class XLOracleRecvBulkThread extends Thread {
 			try { if ( this.oraConnObj != null ) this.oraConnObj.closeConnection(); } catch (Exception e) {} finally { this.oraConnObj = null; }
 			
 			// cksohn - BULK mode oracle sqlldr
-			//this.dataQ.notifyEvent();
+			this.dataQ.notifyEvent();
 
 			
-			XLLogger.outputInfoLog(" !   BulkThread END  !");
 			
 		}
 		

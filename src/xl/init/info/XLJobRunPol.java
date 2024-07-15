@@ -16,7 +16,6 @@ import xl.init.engine.altibase.XLAltibaseRecvBulkThread;
 import xl.init.engine.altibase.XLAltibaseRecvThread;
 import xl.init.engine.cubrid.XLCubridApplyThread;
 import xl.init.engine.cubrid.XLCubridRecvThread;
-
 import xl.init.engine.mariadb.XLMariaDBApplyBulkThread;
 import xl.init.engine.mariadb.XLMariaDBApplyThread;
 import xl.init.engine.mariadb.XLMariaDBRecvBulkThread;
@@ -62,11 +61,16 @@ import xl.init.util.XLUtil;
 public class XLJobRunPol {
 	
 	// 정책 기본 정보
+	// ayzn - XLInit 기능 개발  - XLJobRunPol : jobseq 주석
+	//private long 	jobseq = 0;
 	private String 	polName = "";
+	
+	// ayzn - XLInit 기능 개발  - XLJobRunPol : 옵션 grpcode, tableName 추가
 	private String 	grpCode = "";
 	private String 	tableName = "";
 	private String 	condWhere = ""; // where 조건
 	
+	// ayzn - XLInit 기능 개발  - XLJobRunPol : source 테이블이름
 	private String 	tbSName = "";
 	
 	private int 	polCommitCnt = 100000; // commit 단위
@@ -91,7 +95,7 @@ public class XLJobRunPol {
 	// sql 구문 생성 정보
 	private String 	idxHint = ""; // 소스 기준 - delete시 사용
 	private int 	parallel= 1; // parallel hint 수
-	private boolean orderByYN = true; 
+	private boolean orderByYN = false; 
 	
 	private String 	srcSelectSql = "";
 	private String 	tarInsertSql = "";
@@ -159,6 +163,8 @@ public class XLJobRunPol {
 	
 	// gssg - 한국전파 소스 오라클로 변경
 	// gssg - oracle fileThread 개발
+	// ayzn - XLInit 기능 개발  - XLJobRunPol : init에서 사용하지않는 file생성기능 주석
+	//private XLOracleRecvBulkFileThread oraRecvBulkFileThread = null;
 	
 	// gssg - xl m2m 최초 포팅 개발 - TODO
 	// MySQL
@@ -271,19 +277,18 @@ public class XLJobRunPol {
 			
 			XLMDBManager mDBMgr = new XLMDBManager();
 			
-			//this.polCommitCnt = polCommit;
-			// ayzn - commit_ct 옵션 적용
-			if(XLInit.commit_count!=null && XLInit.commit_count>0)
+			// ayzn - XLInit 기능 개발  - XLJobRunPol : commit_count, parallel 옵션 처리 추가
+			if(XLConf.XL_COMMIT_COUNT>0)
 			{
-				this.polCommitCnt = XLInit.commit_count;
+				this.polCommitCnt = XLConf.XL_COMMIT_COUNT;
 			}	
 			
-			if(XLInit.parallel!=null && XLInit.parallel>1)
+			if(XLConf.XL_PARALLEL>1)
 			{
-				this.parallel = XLInit.parallel;
+				this.parallel = XLConf.XL_PARALLEL;
 			}	
 			
-			// 수행 대상 정보 세팅 (Source, Target)
+			// ayzn - XLInit 기능 개발  - XLJobRunPol :  수행 대상 정보 세팅 (Source, Target)
 			Vector pol_info = null;
 			pol_info = mDBMgr.getPolInfo(this.grpCode, this.polName);
 			
@@ -304,7 +309,7 @@ public class XLJobRunPol {
 		        arr_pol.put(db_type, element);
 			}
 			
-			// 1. 수행해야 할 JOB에 대한 정보를 DB로 부터 추출하여 setting 한다.
+	        
 			String dicOwner = "";
 			String dicTname = "";
 			
@@ -319,8 +324,10 @@ public class XLJobRunPol {
 			
 			this.tbSName = dicTname ;
 			
-			Vector vt = null;
-			vt = mDBMgr.getJobRunPolInfo(_cataConn, this.grpCode, this.polName, dicOwner, dicTname);
+			// 1. 수행해야 할 JOB에 대한 정보를 DB로 부터 추출하여 setting 한다.
+			// ayzn - XLInit 기능 개발  - XLJobRunPol : getJobRunPolInfo 함수처리 시 조건절 추가 및 변경
+			//Vector vt = mDBMgr.getJobRunPolInfo(_cataConn, this.jobseq);
+			Vector vt = mDBMgr.getJobRunPolInfo(_cataConn, this.grpCode, this.polName, dicOwner, dicTname);
 			
 			XLLogger.outputInfoLog("getJobRunPolInfo"); 
 			XLLogger.outputInfoLog(vt);
@@ -345,7 +352,44 @@ public class XLJobRunPol {
 				
 				if ( i == 0 ) { // pol 정보는 한번만 해주면 된다.
 
-
+					
+					// pol 정보
+					// ayzn - XLInit 기능 개발  - XLJobRunPol : CDC 카탈로그 테이블에 없는 설정값 주석처리
+					/*int polCommit = Integer.parseInt((String)ht.get("POL_COMMIT"));
+					String polCpuChkpoint = (String)ht.get("POL_CPU_CHKPOINT");
+					int polTMaxCnt = Integer.parseInt((String)ht.get("POL_TMAX_JOBCNT"));
+					int polPriority = Integer.parseInt((String)ht.get("POL_PRIORITY"));
+					
+					String polIdxHint = (String)ht.get("POL_IDXHINT");
+					int polParallel = Integer.parseInt((String)ht.get("POL_PARALLEL"));
+					String polOrderByYNStr = (String)ht.get("POL_ORDERBY_YN");
+					String polSchedName = (String)ht.get("SCHED_NAME");
+					
+					this.condCommitCnt = Long.parseLong((String)ht.get("CONDITION_COMMIT_CNT"));					
+					this.condSeq = Long.parseLong((String)ht.get("CONDITION_SEQ"));
+					
+					this.condWhere = (String)ht.get("CONDITION_WHERE"); // 여기서 한번 더 셋팅
+					
+					// gssg - 일본 네트워크 분산 처리
+					this.workPlanSeq = Integer.parseInt((String)ht.get("WORKPLAN_SEQ"));
+					
+					// XLLogger.outputInfoLog("CKSOHN DEBUG------ this.condCommitCnt-->>>>>>>>>>>>> " + this.condCommitCnt);
+					
+					this.polCommitCnt = polCommit;
+					this.cpu_chkpoint = polCpuChkpoint;
+					this.tmaxJobCnt = polTMaxCnt;
+					this.priority = polPriority;
+					this.idxHint = polIdxHint;
+					this.parallel = polParallel;
+					if ( polOrderByYNStr.equals("Y") ) {
+						this.orderByYN = true;
+					} else {
+						this.orderByYN = false;
+					}
+					
+					this.schedName = polSchedName;*/
+					
+					// src & tar db 정보
 				    String sdbIp = (String)arr_pol.get("S").get("SVR_IPADDR"); 
 				    String sdbSid =(String)arr_pol.get("S").get("DBMS_SID"); 
 				    String tdbIp =(String)arr_pol.get("T").get("SVR_IPADDR"); 
@@ -355,7 +399,7 @@ public class XLJobRunPol {
 					String sTable = (String)ht.get("DIC_TNAME");
 					String tOwner = (String)ht.get("TB_TOWNER");
 					String tTable = (String)ht.get("TB_TNAME");
-					
+										
 					this.sdbInfo = XLMemInfo.HT_DBMS_INFO.get(sdbIp + "_" + sdbSid);
 					this.tdbInfo = XLMemInfo.HT_DBMS_INFO.get(tdbIp + "_" + tdbSid);
 					
@@ -371,12 +415,15 @@ public class XLJobRunPol {
 					
 					// gssg - SK실트론 O2O -- start
 					// gssg -  FROM 절에 사용자가 정의한 값 그대로 들어가는 기능 지원
-				//	String selectScript = (String)ht.get("POL_SELECT_SCRIPT");
+					// ayzn - XLInit 기능 개발  - XLJobRunPol : CDC 카탈로그 테이블에 없는 설정값 주석처리
+					//	String selectScript = (String)ht.get("POL_SELECT_SCRIPT");
 					String selectScript = "";
-					// gssg - linkMode 지원
-					//String dblinkName = (String)ht.get("POL_DBLINK_NAME");
 					
+					// gssg - linkMode 지원
+					// ayzn - XLInit 기능 개발  - XLJobRunPol : CDC 카탈로그 테이블에 없는 설정값 주석처리
+					//String dblinkName = (String)ht.get("POL_DBLINK_NAME");
 					String dblinkName = "";
+					
 					
 
 					this.tableInfo = new XLJobTableInfo(sOwner, sTable, tOwner, tTable, selectScript, dblinkName);
@@ -389,6 +436,7 @@ public class XLJobRunPol {
 				
 				
 				// 3. Table 컬럼별 정보 생성
+				// ayzn - XLInit 기능 개발  - XLJobRunPol : Table 컬럼 정보 생성 시 CDC 카탈로그 테이블 참조로 변경
 				String colName =  (String)ht.get("DIC_COLNAME");
 				String colNameMap = (String)ht.get("DIC_COLNAME_MAP");
 				String dataTypeStr = (String)ht.get("DIC_DATATYPE");				
@@ -403,15 +451,14 @@ public class XLJobRunPol {
 				String functionStr = (String)ht.get("DIC_FUNCTION");
 
 				/// gssg - 소스 Function 기능 추가
-				//lay: dblink!=null( functionStr)
 				String functionStrSrc = (String)ht.get("DIC_FUNCTION");
 				
 				
 				// gssg - o2o damo 적용
 				// gssg - dicinfo_sec_yn 컬럼 추가
+				// ayzn - XLInit 기능 개발  - XLJobRunPol : CDC 카탈로그 테이블에 없는 설정값 주석처리
 				//String secYN = (String)ht.get("DICINFO_SEC_YN");
 				//String secMapYN = (String)ht.get("DICINFO_SEC_MAP_YN");
-				// lay: orderby 
 				String secYN = "";
 				String secMapYN = "";
 				// gssg - 소스 Function 기능 추가
@@ -436,7 +483,6 @@ public class XLJobRunPol {
 			
 			// gssg - xl p2t 지원
 			// gssg - p2t 하다가 lob check 보완
-			
 			if( sdbInfo.getDbType() == XLCons.ORACLE ) {
 				// gssg - o2t 지원
 				// gssg - interval type 예외처리
@@ -519,7 +565,6 @@ public class XLJobRunPol {
 			
 			XLLogger.outputInfoLog(this.logHead + "make information is finished - " + this.tableInfo.getSowner() + "." + this.tableInfo.getStable());
 						
-			
 			// 4. 수행 구문 생성
 			if ( !makeQuery() ) {
 				// 구문 생성 실패
@@ -563,7 +608,8 @@ public class XLJobRunPol {
 			// 1. Src select 구문 생성
 			// gssg - SK실트론 O2O -- start
 			// gssg - linkMode 지원
-		
+			XLLogger.outputInfoLog("# parallel #" + this.parallel);
+			XLLogger.outputInfoLog("# idxHint #" + this.idxHint);
 			if ( this.tableInfo.getDblinkName() == null || this.tableInfo.getDblinkName().equals("") ) 
 			{
 
@@ -620,7 +666,7 @@ public class XLJobRunPol {
 									// gssg - 소스 Function 기능 추가
 									if ( colInfo.getFunctionStrSrc() != null && !colInfo.getFunctionStrSrc().equals("") ) {
 										// gssg - 국가정보자원관리원 데이터이관 사업
-										// gssg - refactorin												
+										// gssg - refactoring												
 																		
 //										lobSb.append( colInfo.getFunctionStrSrc() + "(" + "e.\"" + colInfo.getColName() + "\".getClobVal()" + ")" + " AS \"" +  colInfo.getColName() + "\"" );
 										sb.append( colInfo.getFunctionStrSrc() + "(" + "e.\"" + colInfo.getColName() + "\".getClobVal()" + ")" + " AS \"" +  colInfo.getColName() + "\"" );
@@ -979,6 +1025,8 @@ public class XLJobRunPol {
 						// gssg - SK텔레콤 O2M, O2P -- end						
 
 					} 
+					// gssg - xl m2m 최초 포팅 개발
+					// gssg - xl m2m 기능 추가
 					else if(this.tdbInfo.getDbType() == XLCons.MYSQL || this.tdbInfo.getDbType() == XLCons.MARIADB ) {					
 						
 						 sb.append("`" + this.tableInfo.getTowner() + "`" + "." + "`" + this.tableInfo.getTtable() + "`");						
@@ -1804,8 +1852,17 @@ public class XLJobRunPol {
 					altibaseRecvBulkThread.start();
 			}
 
-			
-			
+			// cksohn - XL_BULK_MODE_YN - sqlldr 수행순서 조정 - comment
+			/***
+			// 2. Apply Thread 생성
+			byte tdbType = this.tdbInfo.getDbType();
+			switch (tdbType) {
+				case XLCons.ORACLE:
+					oraApplyBulkThread = new XLOracleApplyBulkThread(this);
+					oraApplyBulkThread.start();
+					break;
+			}
+			***/
 			
 		} catch (Exception e) {
 			
@@ -1840,7 +1897,14 @@ public class XLJobRunPol {
 	
 		
 	}
-		
+	
+	// ayzn - XLInit 기능 개발  - XLJobRunPol : jobseq 주석
+	/*public long getJobseq() {
+		return jobseq;
+	}
+	public void setJobseq(long jobseq) {
+		this.jobseq = jobseq;
+	}*/
 	public String getPolName() {
 		return polName;
 	}

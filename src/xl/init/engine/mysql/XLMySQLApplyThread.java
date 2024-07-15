@@ -49,9 +49,9 @@ public class XLMySQLApplyThread extends Thread {
 	private PreparedStatement pstmtInsert = null; // gssg - xl m2m 기능 추가  - 0413
 	
 	private Connection cataConn = null;
-	private PreparedStatement pstmtUpdateJobQCommitCnt = null;
-	private PreparedStatement pstmtUpdateCondCommitCnt = null;
-	
+	// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobq, cond commit 주석
+	//private PreparedStatement pstmtUpdateJobQCommitCnt = null;
+	//private PreparedStatement pstmtUpdateCondCommitCnt = null;
 	
 	private long applyCnt = 0;
 	private long totalCommitCnt =0; // 기존 수행에서 commit된 건수(condCommitCnt) + 이번 수행에서 commit된 건수(applyCnt)
@@ -95,6 +95,9 @@ public class XLMySQLApplyThread extends Thread {
 			// gssg - xl o2m 지원
 			XLMDBManager mDBMgr = new XLMDBManager();
 			this.cataConn = mDBMgr.createConnection(false);			
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobq, cond commit 주석
+			//this.pstmtUpdateJobQCommitCnt = mDBMgr.getPstmtUpdateJobQCommitCnt(this.cataConn);
+			//this.pstmtUpdateCondCommitCnt = mDBMgr.getPstmtUpdateCondCommitCnt(this.cataConn);
 			 
 			
 			// Oracle Connection 생성
@@ -233,7 +236,6 @@ public class XLMySQLApplyThread extends Thread {
 				// EOF check
 				if ( vtData.size() == 1) {
 					
-					
 					ArrayList<String> recordDataArray = vtData.get(0);
 					
 					if ( recordDataArray == null ) {
@@ -253,6 +255,20 @@ public class XLMySQLApplyThread extends Thread {
 						this.applyCnt = 0; // 초기화
 						// XLLogger.outputInfoLog("CKSOHN DEBUG this.totalCommitCnt FINAL = " + this.totalCommitCnt);
 						
+						// ayzn - XLInit 기능 개발  - DB 엔진 수정  : jobq, cond commit 주석
+						/*this.pstmtUpdateJobQCommitCnt.setLong(1,  this.totalCommitCnt);
+						this.pstmtUpdateJobQCommitCnt.setLong(2,  this.jobRunPol.getJobseq());
+						this.pstmtUpdateJobQCommitCnt.setString(3,  this.jobRunPol.getPolName());
+						this.pstmtUpdateJobQCommitCnt.executeUpdate();
+						
+						this.pstmtUpdateCondCommitCnt.setLong(1,  this.totalCommitCnt);
+						this.pstmtUpdateCondCommitCnt.setString(2,  this.jobRunPol.getPolName());
+						this.pstmtUpdateCondCommitCnt.setLong(3,  this.jobRunPol.getCondSeq());
+						// gssg - 일본 네트워크 분산 처리
+						this.pstmtUpdateCondCommitCnt.setLong(4, this.jobRunPol.getWorkPlanSeq());
+
+						this.pstmtUpdateCondCommitCnt.executeUpdate();
+						this.cataConn.commit(); */
 						
 						if ( XLConf.XL_DEBUG_YN ) {
 							XLLogger.outputInfoLog("[DEBUG] commitCnt-FINAL : " + this.totalCommitCnt);
@@ -343,6 +359,10 @@ public class XLMySQLApplyThread extends Thread {
 			// gssg - xl m2m 기능 추가  - 0413
 			try { if ( this.mySQLConnObj != null ) this.mySQLConnObj.closeConnection(); } catch (Exception e) {} finally { this.mySQLConnObj = null; }
 			
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobq, cond commit 주석
+			//try { if ( this.pstmtUpdateJobQCommitCnt != null ) this.pstmtUpdateJobQCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateJobQCommitCnt = null; }
+			//try { if ( this.pstmtUpdateCondCommitCnt != null ) this.pstmtUpdateCondCommitCnt.close(); } catch (Exception e) {} finally { this.pstmtUpdateCondCommitCnt = null; }
+
 			try { if ( this.cataConn != null ) this.cataConn.close(); } catch (Exception e) {} finally { this.cataConn = null; }
 			
 			
@@ -357,7 +377,12 @@ public class XLMySQLApplyThread extends Thread {
 			//}
 			
 			// 메모리 정리는 여기서!!!!!
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobseq 제외
+			//XLMemInfo.removeRJobPolInfo(this.jobRunPol.getPolName(), this.jobRunPol.getJobseq());
 			XLMemInfo.removeRJobPolInfo(this.jobRunPol.getPolName());
+
+			
+			XLInit.POLLING_EVENTQ.notifyEvent();
 			
 			
 		}
@@ -515,11 +540,13 @@ public class XLMySQLApplyThread extends Thread {
 				// gssg - xl m2m 최초 포팅 개발- PPAS Apply 참조 executeUpdate --> addBatch
 				// this.pstmtInsert.executeUpdate();
 				// gssg - xl m2m 기능 추가
+				
 				this.pstmtInsert.addBatch();
 				
 				applyCnt++;
 				
 				if ( applyCnt % this.jobRunPol.getPolCommitCnt() == 0) {
+					
 					
 					// gssg - xl m2m 최초 포팅 개발- PPAS Apply 참조 sendBatch --> executeBatch
 					// this.pstmtInsert.sendBatch();
@@ -536,7 +563,21 @@ public class XLMySQLApplyThread extends Thread {
 					
 					this.applyCnt = 0; // 초기화
 					
+					// ayzn - XLInit 기능 개발  - DB 엔진 수정 : jobq, cond commit 주석
+					/*this.pstmtUpdateJobQCommitCnt.setLong(1,  this.totalCommitCnt);
+					this.pstmtUpdateJobQCommitCnt.setLong(2,  this.jobRunPol.getJobseq());
+					this.pstmtUpdateJobQCommitCnt.setString(3,  this.jobRunPol.getPolName());
+					this.pstmtUpdateJobQCommitCnt.executeUpdate();
 					
+					this.pstmtUpdateCondCommitCnt.setLong(1,  this.totalCommitCnt);
+					this.pstmtUpdateCondCommitCnt.setString(2,  this.jobRunPol.getPolName());
+					this.pstmtUpdateCondCommitCnt.setLong(3,  this.jobRunPol.getCondSeq());
+					// gssg - 일본 네트워크 분산 처리
+					this.pstmtUpdateCondCommitCnt.setLong(4, this.jobRunPol.getWorkPlanSeq());
+
+					this.pstmtUpdateCondCommitCnt.executeUpdate();
+					this.cataConn.commit();*/ 
+
 										
 					if ( XLConf.XL_DEBUG_YN ) {
 						XLLogger.outputInfoLog("[DEBUG] commitCnt-1 : " + this.totalCommitCnt);
@@ -574,8 +615,25 @@ public class XLMySQLApplyThread extends Thread {
 			//	this.jobRunPol.stopRecvThread();
 			// }
 			
+			// ayzn - XLInit 기능 개발  - DB 엔진 수정 : report, condition, jobq 테이블 관련 처리 주석
 			// 2. status 에 따른 정보갱신 및 REPORT 결과 저장
 			//  2-1 REPORT 테이블 결과저장
+			/*if ( !mDBMgr.insertJobResultReport(this.cataConn, this.jobRunPol, this.totalCommitCnt) ) {
+				XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to insert job result report - " + this.jobRunPol.getCondWhere());
+			}
+			
+			//  2-2 CONDITION 테이블 STATUS update
+			if ( !mDBMgr.updateJobResultCond(this.cataConn, this.jobRunPol) ) {
+				XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to updae job result condition_action - " + this.jobRunPol.getCondWhere());
+			}
+						
+			//  2-3 JOBQ 테이블 삭제
+			if ( !mDBMgr.deleteJobQ(this.cataConn, this.jobRunPol) ) {
+				XLLogger.outputInfoLog(this.logHead + "[EXCEPTION] Failed to delete jobQ - " + this.jobRunPol.getCondWhere());
+			}
+			
+			
+			this.cataConn.commit();*/
 
 			// XLLogger.outputInfoLog("[FINISH JOB] END - " + this.jobRunPol.getPolName());
 			// XLLogger.outputInfoLog("[FINISH JOB] END - " + this.jobRunPol.getPolName());

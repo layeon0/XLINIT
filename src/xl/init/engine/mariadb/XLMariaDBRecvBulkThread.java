@@ -309,7 +309,9 @@ public class XLMariaDBRecvBulkThread extends Thread {
 			// gssg - xl m2m bulk mode logging 지원
 			this.jobRunPol.setApplyCnt(recvCnt); // gssg - xl recvCnt를 applyCnt로 적용
 			
+			
 			// cksohn - BULK mode oracle sqlldr
+			this.dataQ.notifyEvent();
 			
 			return;
 			

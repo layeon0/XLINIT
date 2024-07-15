@@ -32,6 +32,10 @@ public class XLConf
 	// Catalog DB Properties from xl.conf
 	// ---------------------------------------------------
 	
+	// gssg -xl lob 타입 보완
+	// gssg - LOB 컬럼 순서 끝으로 처리
+	
+	// ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
 	public static byte		DBTYPE_SRC = XLCons.ORACLE;
 	public static byte 		DBTYPE_STR = XLCons.ORACLE;
 	public static String 	DB_IP = "localhost";
@@ -44,7 +48,7 @@ public class XLConf
 	// cksohn - XL_PASSWD_CONF_ENCRYPT_YN (default N)
 	public static boolean 	XL_PASSWD_CONF_ENCRYPT_YN = false;
 	
-
+	// ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
 	public static String    BULK_MODE = XLInit.bulkMode;
 	
 	// ---------------------------------------------------
@@ -64,7 +68,10 @@ public class XLConf
 	// 엔진 수행시 Recv와 Apply 간 데이터를 주고 받는 내부Q size
 	public static int 		XL_MGR_INTERNAL_QSIZE = 2;
 	
+	// ayzn - XLInit 기능 개발 - conf 수정 (디버그 모드 true로 변경)
+	//public static boolean 	XL_MGR_DEBUG_YN = false;
 	public static boolean 	XL_DEBUG_YN = true;
+	
 	
 	public static int 		XL_SOCK_TIMEOUT = 1000;  // sec
 		
@@ -74,16 +81,17 @@ public class XLConf
 	
 	// cksohn - manager 1.0 최초 버전 수정
 	public static int 		XL_FETCH_SIZE = 2000;
-	public static int 		XL_BATCH_SIZE = 2000;
+	public static int 		XL_BATCH_SIZE = 100;
+
+	// ayzn - XLInit 기능 개발 - conf 수정 (키워드 처리 추가)
 	public static int 		XL_COMMIT_COUNT = 100000;
 	public static int		XL_PARALLEL = 1;
-	public static int 		XL_MGR_SEND_COUNT = 3000;
+	public static int 		XL_MGR_SEND_COUNT = 5000;
 	
 	// cksohn - xlim LOB 타입 지원
 	public static int 		XL_APPLY_LOB_STREAM_BUFFERSIZE = 32768;
 	
 	// cksohn - XL_BULK_MODE_YN conf 값 설정
-	//public static boolean 	XL_BULK_MODE_YN = false;
 	public static boolean 	XL_BULK_MODE_YN = false;
 	
 	
@@ -163,7 +171,7 @@ public class XLConf
 			//###########################
 			// 1. xl.conf read
 			//###########################
-			//---------------------------------------------------batch_size
+			//---------------------------------------------------
 			// sets LOG FILE NAMES
 			//--------------------------------------------------- 
 			XL_CONFIG = XLInit.XL_DIR + File.separator + "conf" + File.separator + "xl.conf";
@@ -171,8 +179,7 @@ public class XLConf
 			// sets a log4j
 			//---------------------------------------------------
 			
-			//XLLogger.outputInfoLog("");
-			
+			// ayzn - XLInit 기능 개발 - conf 수정 (키워드 처리 추가)
 			if(XLInit.commit_count!=null && XLInit.commit_count > 0)
 			{
 				XL_COMMIT_COUNT = XLInit.commit_count;
@@ -192,24 +199,34 @@ public class XLConf
 			{
 				XL_FETCH_SIZE = XLInit.fetch_size;
 			}
+			
+			if(BULK_MODE.equalsIgnoreCase("y"))
+			{
+				XL_BULK_MODE_YN = true;
+			}
+			
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 			Date now = new Date();
 			String nowTime = sdf.format(now);
 			
 	        XL_LOG_FILE = XLInit.XL_DIR + File.separator + "log";
-	        //XL_LOG_FILE_NAME = "xlinit.log";
+	       
 	        
-	        //로그파일형식 오늘날짜시분초_XLINIT_G01_P101_TESTUSER.XL_TEST01.LOG
+	        // ayzn - XLInit 기능 개발 - conf 수정 (로그명 포맷 변경)
+	        // 로그파일형식 오늘날짜시분초_XLINIT_G01_P101_TESTUSER.XL_TEST01.LOG
+	        //XL_LOG_FILE_NAME = "xl_mgr.log";
 	        XL_LOG_FILE_NAME = nowTime + "_XLINIT_" + XLInit.grpCode + "_" + XLInit.polCode + "_" + XLInit.tableName + ".log";
 	        
 	        XLLogger.init(XL_LOG_FILE, XL_LOG_FILE_NAME);
 	        
+	        XLLogger.outputInfoLog("");
 	        XLLogger.outputInfoLog("X-LOG Configuration set starting...");
 	       
 	        XLLogger.outputInfoLog("Init conf start -[");
 	        //---------------------------------------------------
 			// sets a NR Master
 			//---------------------------------------------------	
+	        // ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
 			String dbtype_str = XLConf.getConfValue( "NRM_DBTYPE_STR" );
 			DBTYPE_STR = XLUtil.getDBMSType(dbtype_str);
 			
@@ -263,22 +280,225 @@ public class XLConf
 //			XLLogger.outputInfoLog("CKSOHN DEBUG ----------------!!!");			
 //			long stime = System.currentTimeMillis();
 					
-			//lay : IDL은 conf 관련 테이블이 있으나, CDC는 없음
-			//Vector vt = mDBMgr.getConfValues();		
+			// ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
+			//XLMDBManager mDBMgr = new XLMDBManager();
 			
-			//lay : set bulkmoad
-			if(BULK_MODE.equals("Y") || BULK_MODE.equals("y"))
-			{
-				XL_BULK_MODE_YN = true;
-			}
-			
+			// gssg - 일본 네트워크 분산 처리
+			/*if ( !mDBMgr.checkWorkplanName() ) {
+				XLLogger.outputInfoLog("[EXCEPTION] XL_WORKPLAN_NAME value doesn't exist in XL_WORKPLAN table.");
+    			XLManager.shutdown();
+    			System.exit(0);
+			}*/
+		
+			//Vector vt = mDBMgr.getConfValues();			
 //			long etime = System.currentTimeMillis();
 //			XLLogger.outputInfoLog("CKSOHN DEBUG Elapsed : " + (etime-stime));
 			
 			int retryCnt = 0;
+			/*while ( vt == null ) {
+				
+				retryCnt++;
+				XLLogger.outputInfoLog("Retry get conf values from catalog db (" + retryCnt + ")");
+				if (retryCnt == XL_DBCON_RETRYCNT) {
+					XLLogger.outputInfoLog("[EXCEPTION] Failed to  get conf values from catalog db");
+					XLLogger.outputInfoLog("");
+					XLLogger.outputInfoLog("X-LOG Manager shutdown.");
+					System.exit(0);
+				}
+				Thread.sleep(3000);
+				vt = mDBMgr.getConfValues();
+			}
+
 			
+			for (int i=0; i<vt.size(); i++ ) {
+							
+				Hashtable ht = (Hashtable)vt.get(i);
+				String conf_option = ((String)ht.get("CONF_OPTION")).trim();
+				String conf_value = ((String)ht.get("CONF_VALUE")).trim();
+				
+				if ( conf_option.equals("XL_MGR_PORT") ) {
+					XL_MGR_PORT = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_LOG_CONF") ) {
+					XL_LOG_CONF = conf_value;
+
+				} else if ( conf_option.equals("XL_LOG_LEVEL") ) {
+					XL_LOG_LEVEL = Integer.parseInt(conf_value);
+
+				} else if ( conf_option.equals("XL_DBCON_RETRYCNT") ) {
+					XL_DBCON_RETRYCNT = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_SOCK_TIMEOUT") ) {
+					XL_SOCK_TIMEOUT = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_MGR_POLLING_INT") ) {
+					XL_MGR_POLLING_INT = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_MGR_INTERNAL_QSIZE") ) {
+					XL_MGR_INTERNAL_QSIZE = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_FETCH_SIZE") ) {
+					XL_FETCH_SIZE = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_BATCH_SIZE") ) {
+					XL_BATCH_SIZE = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_MGR_SEND_COUNT") ) {
+					XL_MGR_SEND_COUNT = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_INIT_SCN") ) { // cksohn - XL_INIT_SCN
+					XL_INIT_SCN = Long.parseLong(conf_value);
+				} else if ( conf_option.equals("XL_PASSWD_ENCRYPT_YN") ) {
+                    // 이건 여기서 한번더 xl.conf가 먼저 해보고, XL_CONF에 설정되어 있으면 이걸로.										  
+					if( conf_value.equalsIgnoreCase("N") ) {
+						XL_PASSWD_ENCRYPT_YN = false;
+					}	else {
+						XL_PASSWD_ENCRYPT_YN = true; // default
+					}
+					
+				} else if ( conf_option.equals("XL_MGR_DEBUG_YN") ) {
+                    										  					
+					if( conf_value.equalsIgnoreCase("Y") ) {
+						XL_MGR_DEBUG_YN = true;
+					}	else {
+						XL_MGR_DEBUG_YN = false; // default
+					}
+					
+				// cksohn - XL_BULK_MODE_YN conf 값 설정
+				} else if ( conf_option.equals("XL_BULK_MODE_YN") ) {
+					if( conf_value.equalsIgnoreCase("Y") ) {
+						XL_BULK_MODE_YN = true;
+					}	else {
+						XL_BULK_MODE_YN = false; // default
+					}
+				// cksohn - XL_SRC_CHAR_RAWTOHEX_YN / XL_SRC_CHAR_ENCODE 	
+				} else if ( conf_option.equals("XL_SRC_CHAR_RAWTOHEX_YN") ) {
+					
+					if( conf_value.equalsIgnoreCase("Y") ) {
+						XL_SRC_CHAR_RAWTOHEX_YN = true;
+					}	else {
+						XL_SRC_CHAR_RAWTOHEX_YN = false; // default
+					}
+				//cksohn - XL_SRC_CHAR_RAWTOHEX_YN / XL_SRC_CHAR_ENCODE
+				} else if ( conf_option.equals("XL_SRC_CHAR_ENCODE") ) {
+					
+					XL_SRC_CHAR_ENCODE = conf_value;
+
+				// cksohn - xl XL_LOB_STREAM_YN=Y|*N
+				} else if ( conf_option.equals("XL_LOB_STREAM_YN") ) {
+					
+					if( conf_value.equalsIgnoreCase("Y") ) {
+						XL_LOB_STREAM_YN = true;
+					}	else if ( conf_value.equalsIgnoreCase("N") ) {
+						XL_LOB_STREAM_YN = false; // default
+					}
+
+				} else  if ( conf_option.equals("XL_BULK_ORACLE_EOL") ) { // cksohn - xl bulk mode for oracle - XL_BULK_ORACLE_EOL
+					
+					// XLLogger.outputInfoLog("CKSOHN DEBUG XL_BULK_ORACLE_EOL value = " + conf_value);
+					
+					if( !conf_value.equalsIgnoreCase("") ) {
+						
+						XL_BULK_ORACLE_EOL = conf_value;
+						String hexStr = XLUtil.bytesToHexString(conf_value.getBytes()).toUpperCase();						
+						XL_BULK_ORACLE_EOL_CTL_FORMAT =  "\"STR X'" + hexStr +  "'\"";
+						
+					} else { // cksohn - xl bulk mode for oracle - XL_BULK_ORACLE_EOL - 미사용 옵션
+						
+						XL_BULK_ORACLE_EOL = "";
+						XL_BULK_ORACLE_EOL_CTL_FORMAT = "";
+					}
+				} else if ( conf_option.equals("XL_TIMEZONE") ) {
+
+					// gssg - 전체적으로 보완_start_20221101
+					// gssg - m2m TIMEZONE 설정 추가
+					// gssg - LG엔솔 MS2O
+					// gssg - o2o bulk ltz 보완
+					XL_TIMEZONE = conf_value;
+					
+				} else if ( conf_option.equals("XL_TAR_KEYFILE_PATH") ) {
+
+					// gssg - o2o damo 적용
+					// gssg - XL_TAR_KEYFILE_PATH conf 값 추가
+					XL_TAR_KEYFILE_PATH = conf_value;
+					
+				} else if ( conf_option.equals("XL_CREATE_FILE_YN") ) {
+
+					// gssg - csv file create 기능 추가
+					// gssg - conf 값 추가					
+					if( conf_value.equalsIgnoreCase("Y") ) {
+						XL_CREATE_FILE_YN = true;
+					}	else if ( conf_value.equalsIgnoreCase("N") ) {
+						XL_CREATE_FILE_YN = false; // default
+					}
+					
+				} else if ( conf_option.equals("XL_CREATE_FILE_PATH") ) {
+
+					// gssg - csv file create 기능 추가
+					// gssg - conf 값 추가
+					XL_CREATE_FILE_PATH = conf_value;
+					
+				} else if ( conf_option.equals("XL_CREATE_FILE_DELIMITER") ) {
+
+					// gssg - csv file create 기능 추가
+					// gssg - conf 값 추가
+					XL_CREATE_FILE_DELIMITER = conf_value;
+					
+				} else if ( conf_option.equals("XL_CREATE_FILE_EXTENSION") ) {
+
+					// gssg - csv file create 기능 추가
+					// gssg - conf 값 추가
+					XL_CREATE_FILE_EXTENSION = conf_value;				
+					
+				} else if ( conf_option.equals("XL_ORA1400_SKIP_YN") ) {
+
+					// gssg - LG엔솔 MS2O
+					// gssg - ora1400 스킵 처리
+					if ( conf_value.equalsIgnoreCase("Y") ) {
+						XL_ORA1400_SKIP_YN = true;
+					} else if ( conf_value.equalsIgnoreCase("N") ) {
+						XL_ORA1400_SKIP_YN = false; // default
+					}
+					
+				} else if ( conf_option.equals("XL_CHK_POSTGRESQL_IDLE_SESSION_TIMEOUT") ) {
+
+					// gssg - postgresql 커넥션 타임 아웃 보완
+					XL_CHK_POSTGRESQL_IDLE_SESSION_TIMEOUT = Integer.parseInt(conf_value);
+					
+				} else if ( conf_option.equals("XL_MGR_ALIAS") ) {
+
+					// gssg - SK실트론 O2O
+					// gssg - alias 지원
+					XL_MGR_ALIAS = conf_value;
+					
+				} else if ( conf_option.equals("XL_CHAR_FUNCAPPLY") ) {
+
+					// gssg - 대법원 O2O
+					// gssg - raw_to_varchar2 기능 지원
+					if ( conf_value.equalsIgnoreCase("Y") ) {
+						XL_CHAR_FUNCAPPLY = true;
+					} else if ( conf_value.equalsIgnoreCase("N") ) {
+						XL_CHAR_FUNCAPPLY = false; // default
+					}
+					
+				} else if ( conf_option.equals("XL_MGR_DATA_DEBUG_YN") ) {
+					// gssg - 세븐일레븐 O2MS
+					if ( conf_value.equalsIgnoreCase("Y") ) {
+						XL_MGR_DATA_DEBUG_YN = true;
+					} else if ( conf_value.equalsIgnoreCase("N") ) {
+						XL_MGR_DATA_DEBUG_YN = false; // default
+					}					
+				} 
+				
+				
+				
+
+				
+
+				
+			} // for-end
+			*/
 			XLLogger.outputInfoLog("] Init conf - end");
-			//System.out.println("CKSOHN DEBUG-------- initConf end ");
 			
 			return true;
 			

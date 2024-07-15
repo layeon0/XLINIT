@@ -352,7 +352,7 @@ public class XLPPASRecvBulkThread extends Thread {
 			
 			if (tdbType == XLCons.ORACLE )
 			{
-				this.jobRunPol.setApplyCnt(recvCnt);
+				//this.jobRunPol.setApplyCnt(recvCnt);
 			}
 			
 			// cksohn - BULK mode oracle sqlldr

@@ -1,5 +1,7 @@
 package xl.init.main;
 
+// ayzn - XLInit 기능 개발 
+
 import java.io.File;
 import java.sql.Connection;
 
@@ -28,7 +30,7 @@ public class XLInit {
 	
 	
 	// polling을 위한 event
-	//public static XLPollingEventQ POLLING_EVENTQ = null;
+	public static XLPollingEventQ POLLING_EVENTQ = null;
 	
 	public static XLOptions epOptions = new XLOptions();
 	
@@ -138,6 +140,8 @@ public class XLInit {
     			XLLogger.outputInfoLog("Failed to start X-LOG Init.");
     			System.exit(0);
             }
+            
+            POLLING_EVENTQ = new XLPollingEventQ();
             
             server.run();
              			
@@ -256,7 +260,7 @@ public class XLInit {
 			XLMemInfo.registDbmsInfo();
 			
 				// grp_code, pol_code, table 전달
-				XLInitThread pt = new XLInitThread(epOptions.getGrp_code(),epOptions.getPol_code(),epOptions.getTable());
+				XLInitThread pt = new XLInitThread(epOptions.getGrp_code(), epOptions.getPol_code(), epOptions.getTable());
 				pt.run();
 	}	
 	

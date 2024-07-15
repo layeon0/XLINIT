@@ -209,6 +209,7 @@ public class XLTiberoLoaderThread extends Thread {
 		} finally {
 			
 			// cksohn - BULK mode oracle sqlldr
+			this.jobRunPol.getDataQ().notifyEvent();
 			
 			// cksohn - XL_BULK_MODE_YN - sqlldr 수행순서 조정
 			this.jobRunPol.setRunLoader(false);
