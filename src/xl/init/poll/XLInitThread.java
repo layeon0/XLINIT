@@ -93,7 +93,7 @@ public class XLInitThread extends Thread {
 		
 			 */
 					
-			// ayzn - XLInit 기능 개발  - InitThread : - 1. 소스 DB 정보 세팅
+			// ayzn - XLInit 기능 개발  - InitThread : 1. 소스 DB 정보 세팅
 			String dicOwner = "";
 			String dicTname = "";
 			

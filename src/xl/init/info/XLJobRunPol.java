@@ -288,7 +288,7 @@ public class XLJobRunPol {
 				this.parallel = XLConf.XL_PARALLEL;
 			}	
 			
-			// ayzn - XLInit 기능 개발  - XLJobRunPol :  수행 대상 정보 세팅 (Source, Target)
+			// ayzn - XLInit 기능 개발  - XLJobRunPol : 수행 대상 정보 세팅 (Source, Target)
 			Vector pol_info = null;
 			pol_info = mDBMgr.getPolInfo(this.grpCode, this.polName);
 			

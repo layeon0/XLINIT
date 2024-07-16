@@ -35,7 +35,7 @@ public class XLConf
 	// gssg -xl lob 타입 보완
 	// gssg - LOB 컬럼 순서 끝으로 처리
 	
-	// ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
+	// ayzn - XLInit 기능 개발 - conf 수정 : CDC CATALOG 기준으로 변경
 	public static byte		DBTYPE_SRC = XLCons.ORACLE;
 	public static byte 		DBTYPE_STR = XLCons.ORACLE;
 	public static String 	DB_IP = "localhost";
@@ -48,7 +48,7 @@ public class XLConf
 	// cksohn - XL_PASSWD_CONF_ENCRYPT_YN (default N)
 	public static boolean 	XL_PASSWD_CONF_ENCRYPT_YN = false;
 	
-	// ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
+	// ayzn - XLInit 기능 개발 - conf 수정 : CDC CATALOG 기준으로 변경
 	public static String    BULK_MODE = XLInit.bulkMode;
 	
 	// ---------------------------------------------------
@@ -68,7 +68,7 @@ public class XLConf
 	// 엔진 수행시 Recv와 Apply 간 데이터를 주고 받는 내부Q size
 	public static int 		XL_MGR_INTERNAL_QSIZE = 2;
 	
-	// ayzn - XLInit 기능 개발 - conf 수정 (디버그 모드 true로 변경)
+	// ayzn - XLInit 기능 개발 - conf 수정 : 디버그 모드 true로 변경
 	//public static boolean 	XL_MGR_DEBUG_YN = false;
 	public static boolean 	XL_DEBUG_YN = true;
 	
@@ -83,7 +83,7 @@ public class XLConf
 	public static int 		XL_FETCH_SIZE = 2000;
 	public static int 		XL_BATCH_SIZE = 100;
 
-	// ayzn - XLInit 기능 개발 - conf 수정 (키워드 처리 추가)
+	// ayzn - XLInit 기능 개발 - conf 수정 : 옵션 처리 추가
 	public static int 		XL_COMMIT_COUNT = 100000;
 	public static int		XL_PARALLEL = 1;
 	public static int 		XL_MGR_SEND_COUNT = 5000;
@@ -179,7 +179,7 @@ public class XLConf
 			// sets a log4j
 			//---------------------------------------------------
 			
-			// ayzn - XLInit 기능 개발 - conf 수정 (키워드 처리 추가)
+			// ayzn - XLInit 기능 개발 - conf 수정 : 옵션 처리 추가
 			if(XLInit.commit_count!=null && XLInit.commit_count > 0)
 			{
 				XL_COMMIT_COUNT = XLInit.commit_count;
@@ -212,8 +212,8 @@ public class XLConf
 	        XL_LOG_FILE = XLInit.XL_DIR + File.separator + "log";
 	       
 	        
-	        // ayzn - XLInit 기능 개발 - conf 수정 (로그명 포맷 변경)
-	        // 로그파일형식 오늘날짜시분초_XLINIT_G01_P101_TESTUSER.XL_TEST01.LOG
+	        // ayzn - XLInit 기능 개발 - conf 수정 : 로그명 포맷 변경
+	        // 로그파일형식 - 20240705145830_XLINIT_G01_P101_TESTUSER.XL_TEST01.LOG
 	        //XL_LOG_FILE_NAME = "xl_mgr.log";
 	        XL_LOG_FILE_NAME = nowTime + "_XLINIT_" + XLInit.grpCode + "_" + XLInit.polCode + "_" + XLInit.tableName + ".log";
 	        
@@ -226,7 +226,7 @@ public class XLConf
 	        //---------------------------------------------------
 			// sets a NR Master
 			//---------------------------------------------------	
-	        // ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
+	        // ayzn - XLInit 기능 개발 - conf 수정 : CDC CATALOG 기준으로 변경
 			String dbtype_str = XLConf.getConfValue( "NRM_DBTYPE_STR" );
 			DBTYPE_STR = XLUtil.getDBMSType(dbtype_str);
 			
@@ -280,7 +280,7 @@ public class XLConf
 //			XLLogger.outputInfoLog("CKSOHN DEBUG ----------------!!!");			
 //			long stime = System.currentTimeMillis();
 					
-			// ayzn - XLInit 기능 개발 - conf 수정 (CDC CATALOG 기준으로 변경)
+			// ayzn - XLInit 기능 개발 - conf 수정 : CDC CATALOG 기준으로 변경
 			//XLMDBManager mDBMgr = new XLMDBManager();
 			
 			// gssg - 일본 네트워크 분산 처리
